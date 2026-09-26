@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SUDAI — ابنِ فكرتك</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  :root{
+    --bg:#FAF8F5; --surface:#FFFFFF; --ink:#1C1A17; --ink-soft:#7A756D;
+    --orange:#F17B21; --orange-deep:#D9660D; --orange-tint:#FFF0DF;
+    --border:#EDE6DC; --danger:#D64545; --radius:20px;
+    box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#141210; --surface:#1E1B18; --ink:#F3EEE7; --ink-soft:#9A948B;
+      --orange:#F98A34; --orange-deep:#D9660D; --orange-tint:#2B1D10; --border:#2E2A25;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#141210; --surface:#1E1B18; --ink:#F3EEE7; --ink-soft:#9A948B;
+    --orange:#F98A34; --orange-deep:#D9660D; --orange-tint:#2B1D10; --border:#2E2A25;
+  }
+  html,body{height:100%;}
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:'Cairo',sans-serif;
+    scroll-padding-top:env(safe-area-inset-top,0px); -webkit-tap-highlight-color:transparent; }
+  #app{ max-width:480px; margin:0 auto; min-height:100%; display:flex; flex-direction:column; position:relative; }
+  .screen{ display:none; flex:1; flex-direction:column; padding:20px 20px 100px; }
+  .screen.active{ display:flex; }
+  .brand{ display:flex; align-items:center; gap:10px; justify-content:center; margin:8px 0 28px; }
+  .brand-mark{ width:34px; height:34px; }
+  .brand-name{ font-weight:900; font-size:20px; letter-spacing:0.5px; }
+  .brand-name b{ color:var(--orange); }
+  h1.hero{ font-size:24px; font-weight:900; line-height:1.5; margin:0 0 6px; }
+  p.sub{ color:var(--ink-soft); font-size:14.5px; line-height:1.7; margin:0 0 22px; }
+  label.field-label{ font-size:13.5px; font-weight:700; color:var(--ink-soft); margin:0 0 8px; display:block; }
+  input[type=email], input[type=password], input[type=text], textarea{
+    width:100%; background:var(--surface); border:1.5px solid var(--border); border-radius:14px;
+    padding:14px 16px; font-family:inherit; font-size:15px; color:var(--ink); outline:none; transition:border-color .15s ease; }
+  input:focus, textarea:focus{ border-color:var(--orange); }
+  textarea{ min-height:120px; resize:vertical; line-height:1.6; }
+  .btn{ border:none; border-radius:16px; padding:16px; font-family:inherit; font-size:16px; font-weight:700;
+    cursor:pointer; width:100%; transition:transform .1s ease, opacity .15s ease; }
+  .btn:active{ transform:scale(0.98); }
+  .btn:disabled{ opacity:.55; cursor:default; }
+  .btn-primary{ background:var(--orange); color:#fff; box-shadow:0 8px 20px -8px rgba(241,123,33,.6); }
+  .btn-ghost{ background:var(--orange-tint); color:var(--orange-deep); }
+  .btn-outline{ background:transparent; border:1.5px solid var(--border); color:var(--ink); }
+  .btn-link{ background:none; border:none; color:var(--orange-deep); font-family:inherit; font-weight:700; font-size:13.5px; cursor:pointer; padding:6px; }
+  .stack{ display:flex; flex-direction:column; gap:14px; }
+  .row{ display:flex; gap:12px; }
+  .row > *{ flex:1; }
+  .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px; }
+  .type-pick{ display:flex; flex-direction:column; align-items:center; gap:8px; padding:18px 10px;
+    border:1.5px solid var(--border); border-radius:16px; cursor:pointer; background:var(--surface);
+    font-size:13.5px; font-weight:700; color:var(--ink-soft); }
+  .type-pick.selected{ border-color:var(--orange); background:var(--orange-tint); color:var(--orange-deep); }
+  .type-pick .ic{ font-size:22px; }
+  #nav{ position:fixed; bottom:0; left:0; right:0; max-width:480px; margin:0 auto;
+    background:var(--surface); border-top:1px solid var(--border); display:flex; justify-content:space-around;
+    align-items:center; padding:10px 6px calc(10px + env(safe-area-inset-bottom,0px)); }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--ink-soft);
+    font-size:11.5px; font-weight:700; background:none; border:none; font-family:inherit; cursor:pointer;
+    padding:4px 8px; border-radius:12px; }
+  .nav-item .ic{ font-size:19px; }
+  .nav-item.active{ color:var(--orange); }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .topbar .t{ font-size:19px; font-weight:900; }
+  #genStatus{ display:flex; align-items:center; gap:10px; color:var(--ink-soft); font-size:14px; padding:14px 0; }
+  .spinner{ width:18px; height:18px; border-radius:50%; border:2.5px solid var(--orange-tint);
+    border-top-color:var(--orange); animation:spin .7s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  #previewWrap{ display:none; margin-top:8px; }
+  #previewFrame{ width:100%; height:360px; border:1px solid var(--border); border-radius:16px; background:#fff; }
+  .proj-item{ display:flex; align-items:center; gap:12px; padding:14px; border:1px solid var(--border);
+    border-radius:16px; background:var(--surface); cursor:pointer; margin-bottom:12px; }
+  .proj-item .proj-ic{ width:42px; height:42px; border-radius:12px; background:var(--orange-tint);
+    color:var(--orange-deep); display:flex; align-items:center; justify-content:center; font-size:18px; flex:none; }
+  .proj-item .proj-meta{ flex:1; min-width:0; }
+  .proj-item .proj-name{ font-weight:700; font-size:14.5px; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .proj-item .proj-sub{ font-size:12.5px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .empty{ text-align:center; color:var(--ink-soft); font-size:14px; padding:60px 20px; line-height:1.8; }
+  .empty .ic{ font-size:34px; display:block; margin-bottom:10px; }
+  #chatLog{ flex:1; display:flex; flex-direction:column; gap:12px; overflow-y:auto; padding-bottom:12px; }
+  .msg{ max-width:82%; padding:12px 14px; border-radius:16px; font-size:14.5px; line-height:1.7; }
+  .msg.bot{ background:var(--surface); border:1px solid var(--border); align-self:flex-start; border-bottom-right-radius:4px; }
+  .msg.user{ background:var(--orange); color:#fff; align-self:flex-end; border-bottom-left-radius:4px; }
+  #chatBar{ position:sticky; bottom:0; display:flex; gap:8px; padding-top:10px; background:var(--bg); }
+  #chatBar input{ flex:1; }
+  #chatBar button{ width:46px; height:46px; border-radius:50%; background:var(--orange); color:#fff; border:none; font-size:17px; flex:none; }
+  .toast{ position:fixed; bottom:96px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--bg);
+    padding:10px 18px; border-radius:100px; font-size:13.5px; opacity:0; pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease; z-index:50; white-space:nowrap; text-align:center; max-width:88%; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
+  .acct-row{ display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--border); font-size:14.5px; }
+  .acct-row:last-of-type{ border-bottom:none; }
+  .badge{ font-size:11px; font-weight:700; padding:3px 9px; border-radius:100px; background:var(--orange-tint); color:var(--orange-deep); }
+  .err{ color:var(--danger); font-size:13px; min-height:16px; }
+  .admin-row{ display:flex; align-items:center; gap:10px; padding:14px; border:1px solid var(--border);
+    border-radius:16px; background:var(--surface); margin-bottom:12px; }
+  .admin-row .info{ flex:1; min-width:0; }
+  .admin-row .em{ font-weight:700; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .admin-row .meta2{ font-size:12px; color:var(--ink-soft); }
+  .ban-btn{ font-size:12.5px; font-weight:700; border:none; border-radius:12px; padding:9px 14px; cursor:pointer; flex:none; font-family:inherit; }
+  .ban-btn.ban{ background:#FCE7E7; color:var(--danger); }
+  .ban-btn.unban{ background:var(--orange-tint); color:var(--orange-deep); }
+  .status-banned{ color:var(--danger); font-weight:700; }
+  .tabs2{ display:flex; gap:8px; margin-bottom:18px; }
+  .tabs2 button{ flex:1; padding:10px; border-radius:12px; border:1.5px solid var(--border); background:var(--surface);
+    font-family:inherit; font-weight:700; font-size:13.5px; color:var(--ink-soft); cursor:pointer; }
+  .tabs2 button.active{ border-color:var(--orange); color:var(--orange-deep); background:var(--orange-tint); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ AUTH ============ -->
+  <section class="screen active" id="screen-auth">
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 100 100"><path d="M30 30 L50 50 L30 70" stroke="#1C1A17" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M70 30 L50 50 L70 70" stroke="#F17B21" stroke-width="12" fill="none" stroke-linecap="round"/></svg>
+        <div class="brand-name">SUD<b>AI</b></div>
+      </div>
+      <h1 class="hero" style="text-align:center;">حوّل فكرتك إلى منتج حقيقي</h1>
+      <p class="sub" style="text-align:center;">سجّل الدخول أو أنشئ حساباً للمتابعة</p>
+      <div class="tabs2">
+        <button class="active" id="tabLogin" onclick="switchAuthTab('login')">تسجيل الدخول</button>
+        <button id="tabSignup" onclick="switchAuthTab('signup')">إنشاء حساب</button>
+      </div>
+      <form class="stack" id="authForm">
+        <div>
+          <label class="field-label">البريد الإلكتروني</label>
+          <input type="email" id="authEmail" required>
+        </div>
+        <div>
+          <label class="field-label">كلمة المرور</label>
+          <input type="password" id="authPassword" required minlength="6">
+        </div>
+        <div class="err" id="authErr"></div>
+        <button class="btn btn-primary" type="submit" id="authSubmit">تسجيل الدخول</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ CREATE ============ -->
+  <section class="screen" id="screen-create">
+    <div class="topbar">
+      <div class="t">إنشاء مشروع</div>
+      <div class="badge">بالذكاء الاصطناعي</div>
+    </div>
+    <div class="card stack" style="background:var(--ink); margin-bottom:18px;">
+      <div style="color:#fff; font-weight:800; font-size:16px; line-height:1.6;">حوّل فكرتك إلى منتج حقيقي</div>
+      <div style="color:#cfc9c0; font-size:13px; line-height:1.7;">اكتب فكرتك وسنبني لك نسخة تجريبية عاملة يمكنك معاينتها وتنزيلها فوراً.</div>
+    </div>
+    <div class="stack">
+      <div>
+        <label class="field-label">نوع المشروع</label>
+        <div class="row">
+          <div class="type-pick selected" data-type="موقع إلكتروني" onclick="pickType(this)"><span class="ic">🌐</span> موقع إلكتروني</div>
+          <div class="type-pick" data-type="تطبيق جوال" onclick="pickType(this)"><span class="ic">📱</span> تطبيق جوال</div>
+        </div>
+      </div>
+      <div>
+        <label class="field-label">اسم المشروع</label>
+        <input type="text" id="projName" placeholder="مثال: متجر القهوة">
+      </div>
+      <div>
+        <label class="field-label">صف فكرتك بالتفصيل</label>
+        <textarea id="ideaInput" placeholder="مثال: موقع لعرض قائمة قهوة مع صفحة عن المقهى وطريقة للتواصل عبر واتساب..."></textarea>
+      </div>
+      <button class="btn btn-primary" id="genBtn" onclick="generate()">✨ إنشاء التصور</button>
+      <div id="genStatus" style="display:none;"><div class="spinner"></div><span id="genStatusText">جاري البناء...</span></div>
+      <div id="previewWrap" class="stack">
+        <label class="field-label">المعاينة</label>
+        <iframe id="previewFrame" sandbox="allow-scripts allow-same-origin"></iframe>
+        <div class="row">
+          <button class="btn btn-ghost" onclick="downloadCurrent()">⬇️ تنزيل الملف</button>
+          <button class="btn btn-outline" onclick="resetCreate()">مشروع جديد</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROJECTS ============ -->
+  <section class="screen" id="screen-projects">
+    <div class="topbar"><div class="t">مشاريعي</div></div>
+    <div id="projectsList" class="stack"></div>
+  </section>
+
+  <!-- ============ SUPPORT ============ -->
+  <section class="screen" id="screen-support" style="padding-bottom:16px;">
+    <div class="topbar"><div class="t">الدعم</div></div>
+    <div id="chatLog"></div>
+    <div id="chatBar">
+      <input type="text" id="chatInput" placeholder="اكتب رسالتك..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button onclick="sendChat()">➤</button>
+    </div>
+  </section>
+
+  <!-- ============ ADMIN ============ -->
+  <section class="screen" id="screen-admin">
+    <div class="topbar"><div class="t">لوحة الإدارة</div></div>
+    <div class="row" style="margin-bottom:16px;">
+      <div class="card" style="text-align:center;">
+        <div style="font-size:22px; font-weight:900;" id="adminUserCount">—</div>
+        <div style="font-size:12px; color:var(--ink-soft);">مستخدم</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:22px; font-weight:900;" id="adminProjectCount">—</div>
+        <div style="font-size:12px; color:var(--ink-soft);">مشروع</div>
+      </div>
+    </div>
+    <div id="adminUsersList" class="stack"></div>
+  </section>
+
+  <!-- ============ ACCOUNT ============ -->
+  <section class="screen" id="screen-account">
+    <div class="topbar"><div class="t">حسابي</div></div>
+    <div class="card stack">
+      <div class="acct-row"><span style="color:var(--ink-soft);">البريد الإلكتروني</span><b id="acctEmail">—</b></div>
+      <div class="acct-row"><span style="color:var(--ink-soft);">عدد المشاريع</span><b id="acctCount">0</b></div>
+    </div>
+    <div style="height:16px;"></div>
+    <button class="btn btn-outline" onclick="signOut()">تسجيل الخروج</button>
+  </section>
+
+  <nav id="nav" style="display:none;">
+    <button class="nav-item" data-tab="admin" id="navAdmin" style="display:none;" onclick="showTab('admin')"><span class="ic">🛡️</span>الإدارة</button>
+    <button class="nav-item active" data-tab="create" onclick="showTab('create')"><span class="ic">✨</span>إنشاء</button>
+    <button class="nav-item" data-tab="projects" onclick="showTab('projects')"><span class="ic">📁</span>مشاريعي</button>
+    <button class="nav-item" data-tab="support" onclick="showTab('support')"><span class="ic">🎧</span>الدعم</button>
+    <button class="nav-item" data-tab="account" onclick="showTab('account')"><span class="ic">👤</span>حسابي</button>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://whfslodbtshhxkaldedl.supabase.co";
+const SUPABASE_KEY = "sb_publishable_epndihGLE_xvJ-MNb4A5TA_lOlG7A8e";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const ADMIN_EMAIL = "tarig0905426979@gmail.com";
+let sampleCap=null, downloadsCap=null;
+let currentUser=null;
+let isAdmin=false;
+let projects=[];
+let currentType='موقع إلكتروني';
+let currentGenerated=null;
+let authMode='login';
+
+async function initCaps(){
+  try{ sampleCap = await window.claude.use('sample'); }catch(e){ sampleCap=null; }
+  try{ downloadsCap = await window.claude.use('downloads'); }catch(e){ downloadsCap=null; }
+  const { data:{ session } } = await sb.auth.getSession();
+  if(session && session.user){ currentUser = session.user; await afterLogin(); }
+}
+
+sb.auth.onAuthStateChange((event, session)=>{
+  if(event==='SIGNED_IN' && session && session.user && !currentUser){
+    currentUser = session.user; afterLogin();
+  }
+  if(event==='SIGNED_OUT'){ currentUser=null; showAuthScreen(); }
+});
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._h);
+  t._h=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+function switchAuthTab(mode){
+  authMode=mode;
+  document.getElementById('tabLogin').classList.toggle('active', mode==='login');
+  document.getElementById('tabSignup').classList.toggle('active', mode==='signup');
+  document.getElementById('authSubmit').textContent = mode==='login' ? 'تسجيل الدخول' : 'إنشاء حساب';
+  document.getElementById('authErr').textContent='';
+}
+
+document.getElementById('authForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const email=document.getElementById('authEmail').value.trim();
+  const password=document.getElementById('authPassword').value;
+  const errEl=document.getElementById('authErr');
+  const btn=document.getElementById('authSubmit');
+  errEl.textContent=''; btn.disabled=true;
+  try{
+    if(authMode==='signup'){
+      const { data, error } = await sb.auth.signUp({ email, password });
+      if(error) throw error;
+      if(data.session){ currentUser=data.user; await afterLogin(); }
+      else { showToast('تم إنشاء الحساب، تحقق من بريدك لتأكيده ثم سجّل الدخول'); switchAuthTab('login'); }
+    } else {
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if(error) throw error;
+      currentUser=data.user; await afterLogin();
+    }
+  }catch(err){
+    errEl.textContent = translateAuthError(err.message);
+  }
+  btn.disabled=false;
+});
+
+function translateAuthError(msg){
+  if(!msg) return 'حدث خطأ، حاول مرة أخرى';
+  if(/invalid login credentials/i.test(msg)) return 'بريد إلكتروني أو كلمة مرور غير صحيحة';
+  if(/user already registered/i.test(msg)) return 'هذا البريد مسجّل مسبقاً، جرّب تسجيل الدخول';
+  if(/password should be/i.test(msg)) return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+  if(/email not confirmed/i.test(msg)) return 'يرجى تأكيد بريدك الإلكتروني أولاً (تحقق من صندوق الوارد)';
+  return msg;
+}
+
+function showAuthScreen(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-auth').classList.add('active');
+  document.getElementById('nav').style.display='none';
+  document.getElementById('authForm').reset();
+}
+
+async function afterLogin(){
+  document.getElementById('screen-auth').classList.remove('active');
+  document.getElementById('nav').style.display='flex';
+  document.getElementById('acctEmail').textContent = currentUser.email;
+  isAdmin = (currentUser.email === ADMIN_EMAIL);
+  document.getElementById('navAdmin').style.display = isAdmin ? 'flex' : 'none';
+  await loadProjects();
+  showTab('create');
+}
+
+async function signOut(){
+  await sb.auth.signOut();
+}
+
+function showTab(tab){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+tab).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  if(tab==='projects') renderProjects();
+  if(tab==='account'){ document.getElementById('acctCount').textContent=projects.length; }
+  if(tab==='admin' && isAdmin) loadAdminUsers();
+  if(tab==='support' && document.getElementById('chatLog').children.length===0){
+    addMsg('bot','أهلاً بك في دعم SUDAI 👋 أخبرني كيف يمكنني مساعدتك في بناء مشروعك.');
+  }
+}
+
+function pickType(el){
+  document.querySelectorAll('.type-pick').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+  currentType=el.dataset.type;
+}
+
+async function loadProjects(){
+  projects=[];
+  try{
+    const { data, error } = await sb.from('projects').select('*').order('created_at',{ascending:false});
+    if(!error && data) projects=data;
+  }catch(e){}
+}
+
+function renderProjects(){
+  const list=document.getElementById('projectsList');
+  list.innerHTML='';
+  if(!projects.length){
+    list.innerHTML = '<div class="empty"><span class="ic">📁</span>لا توجد مشاريع بعد<br>ابدأ من تبويب "إنشاء"</div>';
+    return;
+  }
+  projects.forEach(p=>{
+    const div=document.createElement('div');
+    div.className='proj-item';
+    div.innerHTML = '<div class="proj-ic">'+(p.type==='تطبيق جوال'?'📱':'🌐')+'</div>'+
+      '<div class="proj-meta"><div class="proj-name">'+escapeHtml(p.name||'بدون اسم')+'</div>'+
+      '<div class="proj-sub">'+escapeHtml((p.idea||'').slice(0,40))+'</div></div>';
+    div.onclick=()=>openSaved(p);
+    list.appendChild(div);
+  });
+}
+
+function openSaved(p){
+  showTab('create');
+  document.getElementById('projName').value=p.name||'';
+  document.getElementById('ideaInput').value=p.idea||'';
+  currentGenerated=p;
+  if(p.html){
+    document.getElementById('previewWrap').style.display='flex';
+    document.getElementById('previewFrame').srcdoc=p.html;
+  } else {
+    document.getElementById('previewWrap').style.display='none';
+  }
+}
+
+async function loadAdminUsers(){
+  const list=document.getElementById('adminUsersList');
+  list.innerHTML = '<div class="empty">جاري التحميل...</div>';
+  try{
+    const { data, error } = await sb.rpc('admin_list_users');
+    if(error) throw error;
+    document.getElementById('adminUserCount').textContent = data.length;
+    document.getElementById('adminProjectCount').textContent = data.reduce((a,u)=>a+Number(u.project_count||0),0);
+    list.innerHTML='';
+    if(!data.length){ list.innerHTML='<div class="empty">لا يوجد مستخدمون بعد</div>'; return; }
+    data.forEach(u=>{
+      const banned = u.banned_until && new Date(u.banned_until) > new Date();
+      const div=document.createElement('div');
+      div.className='admin-row';
+      div.innerHTML =
+        '<div class="info">'+
+          '<div class="em">'+escapeHtml(u.email||'—')+'</div>'+
+          '<div class="meta2">'+(banned?'<span class="status-banned">محظور</span> · ':'')+
+            'مشاريع: '+(u.project_count||0)+' · '+new Date(u.created_at).toLocaleDateString('ar-EG')+
+          '</div>'+
+        '</div>'+
+        '<button class="ban-btn '+(banned?'unban':'ban')+'" data-id="'+u.id+'" data-banned="'+banned+'">'+(banned?'رفع الحظر':'حظر')+'</button>';
+      div.querySelector('button').onclick = (e)=>toggleBan(u.id, banned, e.target);
+      list.appendChild(div);
+    });
+  }catch(err){
+    list.innerHTML = '<div class="empty">تعذّر تحميل المستخدمين<br>('+(err.message||'')+')</div>';
+  }
+}
+
+async function toggleBan(userId, currentlyBanned, btn){
+  btn.disabled=true;
+  try{
+    const { error } = await sb.rpc('admin_set_ban', { target_user_id:userId, ban:!currentlyBanned });
+    if(error) throw error;
+    showToast(currentlyBanned ? 'تم رفع الحظر' : 'تم حظر المستخدم');
+    await loadAdminUsers();
+  }catch(err){
+    showToast('تعذّر تنفيذ العملية');
+    btn.disabled=false;
+  }
+}
+
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+async function generate(){
+  const name=document.getElementById('projName').value.trim()||'مشروعي';
+  const idea=document.getElementById('ideaInput').value.trim();
+  if(!idea){ showToast('اكتب فكرة المشروع أولاً'); return; }
+  if(!sampleCap){ showToast('ميزة التوليد غير متاحة حالياً'); return; }
+
+  const btn=document.getElementById('genBtn');
+  btn.disabled=true;
+  document.getElementById('genStatus').style.display='flex';
+  document.getElementById('previewWrap').style.display='none';
+  document.getElementById('genStatusText').textContent='جاري البناء...';
+
+  const prompt = "أنت مولّد مواقع وتطبيقات. أنشئ ملف HTML واحد متكامل ومستقل (يحتوي CSS وJS بداخله فقط، بدون أي روابط خارجية) يمثل نسخة تجريبية عاملة وحديثة من الفكرة التالية.\nنوع المنتج: "+currentType+"\nاسم المشروع: "+name+"\nوصف الفكرة: "+idea+"\n\nالمتطلبات:\n- تصميم حديث وعملي، متجاوب مع الجوال، بواجهة عربية (dir=\"rtl\") إن كانت الفكرة بالعربية.\n- اجعله تفاعلياً قدر الإمكان باستخدام JavaScript بسيط داخل الملف (بدون طلبات شبكة خارجية).\n- أرجع فقط كود HTML كاملاً بدءاً من <!DOCTYPE html> بدون أي شرح أو نص إضافي أو علامات markdown.";
+
+  try{
+    const res = await sampleCap(prompt, {
+      modelTier:'complex',
+      cache:false,
+      onText:({text})=>{ document.getElementById('genStatusText').textContent='جاري البناء... ('+text.length+' حرف)'; }
+    });
+    let html = (res.text||'').trim();
+    html = html.replace(/^```(?:html)?/i,'').replace(/```$/,'').trim();
+    if(!/^<!DOCTYPE|^<html/i.test(html)){
+      showToast('تعذّر بناء نسخة صالحة، حاول صياغة الفكرة بشكل أوضح');
+      document.getElementById('genStatus').style.display='none';
+      btn.disabled=false;
+      return;
+    }
+    document.getElementById('previewFrame').srcdoc=html;
+    document.getElementById('previewWrap').style.display='flex';
+    if(res.truncated) showToast('تم قص الناتج، قد تحتاج فكرة أبسط لنتيجة كاملة');
+
+    const record = { name, idea, type:currentType, html };
+    const { data, error } = await sb.from('projects').insert(record).select().single();
+    if(!error && data){ currentGenerated=data; projects.unshift(data); }
+    else { currentGenerated=record; }
+  }catch(err){
+    showToast('حدث خطأ أثناء التوليد، حاول مرة أخرى');
+  }
+  document.getElementById('genStatus').style.display='none';
+  btn.disabled=false;
+}
+
+async function downloadCurrent(){
+  if(!currentGenerated || !currentGenerated.html){ return; }
+  if(!downloadsCap){ showToast('التنزيل غير متاح في هذه الجلسة'); return; }
+  try{
+    await downloadsCap.save({ filename:(currentGenerated.name||'project')+'.html', data:currentGenerated.html });
+  }catch(e){ showToast('تعذّر حفظ الملف'); }
+}
+
+function resetCreate(){
+  document.getElementById('projName').value='';
+  document.getElementById('ideaInput').value='';
+  document.getElementById('previewWrap').style.display='none';
+  currentGenerated=null;
+}
+
+function addMsg(who,text){
+  const log=document.getElementById('chatLog');
+  const d=document.createElement('div');
+  d.className='msg '+who;
+  d.textContent=text;
+  log.appendChild(d);
+  log.scrollTop=log.scrollHeight;
+}
+
+async function sendChat(){
+  const inp=document.getElementById('chatInput');
+  const val=inp.value.trim();
+  if(!val) return;
+  addMsg('user',val);
+  inp.value='';
+  if(!sampleCap){ addMsg('bot','عذراً، الدعم الذكي غير متاح حالياً.'); return; }
+  addMsg('bot','...');
+  const log=document.getElementById('chatLog');
+  const placeholder=log.lastChild;
+  try{
+    const res = await sampleCap("أنت مساعد دعم تطبيق SUDAI لبناء المواقع والتطبيقات بالذكاء الاصطناعي. أجب باختصار ووضوح بالعربية على سؤال المستخدم التالي:\n"+val, { modelTier:'quick' });
+    placeholder.textContent = res.text || 'حدث خطأ في الرد.';
+  }catch(e){
+    placeholder.textContent='تعذّر الاتصال بالدعم الآن.';
+  }
+}
+
+initCaps();
+</script>
+</body>
+</html>
