@@ -222,7 +222,7 @@
   </section>
 
   <!-- ============ SUPPORT ============ -->
-  <section class="screen" id="screen-support" style="padding-bottom:16px;">
+  <section class="screen" id="screen-support">
     <div class="topbar"><div class="t">الدعم</div></div>
     <div id="chatLog"></div>
     <div id="chatBar">
@@ -420,20 +420,22 @@ let currentType='موقع إلكتروني';
 let currentGenerated=null;
 let authMode='login';
 
-const GEMINI_KEY = "AQ.Ab8RN6KaB_FIrJkM_p5dcL1MMxdrerLlcAhYE0jZAOVAgIkxPQ";
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent";
+const GROQ_KEY = "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";
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 async function callGemini(prompt){
-  const res = await fetch(GEMINI_URL, {
+  const res = await fetch(GROQ_URL, {
     method:'POST',
-    headers:{ 'Content-Type':'application/json', 'X-goog-api-key':GEMINI_KEY },
-    body: JSON.stringify({ contents:[{ parts:[{ text: prompt }] }] })
+    headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+GROQ_KEY },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role:'user', content: prompt }],
+      temperature: 0.7
+    })
   });
   const data = await res.json();
-  if(!res.ok) throw new Error((data.error && data.error.message) || 'gemini_error');
-  const text = data.candidates && data.candidates[0] && data.candidates[0].content &&
-    data.candidates[0].content.parts && data.candidates[0].content.parts[0] &&
-    data.candidates[0].content.parts[0].text;
+  if(!res.ok) throw new Error((data.error && data.error.message) || 'groq_error');
+  const text = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
   if(!text) throw new Error('empty_response');
   return text;
 }
