@@ -110,6 +110,14 @@
   .ban-btn.ban{ background:#FCE7E7; color:var(--danger); }
   .ban-btn.unban{ background:var(--orange-tint); color:var(--orange-deep); }
   .status-banned{ color:var(--danger); font-weight:700; }
+  .admin-card{ display:flex; align-items:center; gap:14px; padding:16px; border:1px solid var(--border);
+    border-radius:18px; background:var(--surface); cursor:pointer; }
+  .admin-card-ic{ width:44px; height:44px; border-radius:12px; background:var(--orange-tint);
+    display:flex; align-items:center; justify-content:center; font-size:19px; flex:none; }
+  .admin-card-body{ flex:1; min-width:0; }
+  .admin-card-body .t2{ font-weight:800; font-size:14.5px; margin-bottom:2px; }
+  .admin-card-body .s2{ font-size:12px; color:var(--ink-soft); line-height:1.5; }
+  .admin-card .chev{ color:var(--ink-soft); font-size:18px; transform:scaleX(-1); flex:none; }
   .tabs2{ display:flex; gap:8px; margin-bottom:18px; }
   .tabs2 button{ flex:1; padding:10px; border-radius:12px; border:1.5px solid var(--border); background:var(--surface);
     font-family:inherit; font-weight:700; font-size:13.5px; color:var(--ink-soft); cursor:pointer; }
@@ -144,6 +152,27 @@
         <div class="err" id="authErr"></div>
         <button class="btn btn-primary" type="submit" id="authSubmit">تسجيل الدخول</button>
       </form>
+      <button class="btn-link" id="forgotBtn" style="margin-top:6px;" onclick="forgotPassword()">هل نسيت كلمة المرور؟</button>
+      <a href="https://wa.me/249993668386" target="_blank" class="btn" style="text-decoration:none; text-align:center; display:block; margin-top:14px; background:#25D366; color:#fff;">💬 تواصل مع المطوّر عبر واتساب</a>
+    </div>
+  </section>
+
+  <!-- ============ RESET PASSWORD ============ -->
+  <section class="screen" id="screen-reset-password">
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 100 100"><path d="M30 30 L50 50 L30 70" stroke="#1C1A17" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M70 30 L50 50 L70 70" stroke="#F17B21" stroke-width="12" fill="none" stroke-linecap="round"/></svg>
+        <div class="brand-name">SUD<b>AI</b></div>
+      </div>
+      <h1 class="hero" style="text-align:center;">تعيين كلمة مرور جديدة</h1>
+      <div class="stack">
+        <div>
+          <label class="field-label">كلمة المرور الجديدة</label>
+          <input type="password" id="newPassword" minlength="6">
+        </div>
+        <div class="err" id="resetErr"></div>
+        <button class="btn btn-primary" onclick="confirmNewPassword()">تحديث كلمة المرور</button>
+      </div>
     </div>
   </section>
 
@@ -162,7 +191,7 @@
         <label class="field-label">نوع المشروع</label>
         <div class="row">
           <div class="type-pick selected" data-type="موقع إلكتروني" onclick="pickType(this)"><span class="ic">🌐</span> موقع إلكتروني</div>
-          <div class="type-pick" data-type="تطبيق جوال" onclick="pickType(this)"><span class="ic">📱</span> تطبيق جوال</div>
+          <div class="type-pick" data-type="تطبيق جوال" style="opacity:.6;" onclick="showToast('سيتوفر قريباً')"><span class="ic">📱</span> تطبيق جوال</div>
         </div>
       </div>
       <div>
@@ -202,9 +231,9 @@
     </div>
   </section>
 
-  <!-- ============ ADMIN ============ -->
+  <!-- ============ ADMIN HOME ============ -->
   <section class="screen" id="screen-admin">
-    <div class="topbar"><div class="t">لوحة الإدارة</div></div>
+    <div class="topbar"><div class="t">لوحة إدارة SUDAI</div></div>
     <div class="row" style="margin-bottom:16px;">
       <div class="card" style="text-align:center;">
         <div style="font-size:22px; font-weight:900;" id="adminUserCount">—</div>
@@ -215,7 +244,105 @@
         <div style="font-size:12px; color:var(--ink-soft);">مشروع</div>
       </div>
     </div>
+    <div class="stack">
+      <div class="admin-card" onclick="openAdminPayments()">
+        <div class="admin-card-ic">💳</div>
+        <div class="admin-card-body"><div class="t2">المدفوعات والإشعارات</div><div class="s2">فحص الإشعار واعتماد أو رفض الدفع</div></div>
+        <div class="chev">‹</div>
+      </div>
+      <div class="admin-card" onclick="openAdminUsers()">
+        <div class="admin-card-ic">🛠️</div>
+        <div class="admin-card-body"><div class="t2">المشاريع والبناء</div><div class="s2">السجلات، المستخدمون، والحظر</div></div>
+        <div class="chev">‹</div>
+      </div>
+      <div class="admin-card" onclick="showToast('سيتوفر قريباً')">
+        <div class="admin-card-ic">⬆️</div>
+        <div class="admin-card-body"><div class="t2">طلبات النشر</div><div class="s2">فقط المشاريع التي منح أصحابها تفويضاً</div></div>
+        <div class="chev">‹</div>
+      </div>
+      <div class="admin-card" onclick="showScreen('admin-support')">
+        <div class="admin-card-ic">🎧</div>
+        <div class="admin-card-body"><div class="t2">خدمة العملاء والمراجعات</div><div class="s2">التذاكر والنزاعات وتحويلها لمختص</div></div>
+        <div class="chev">‹</div>
+      </div>
+      <div class="admin-card" onclick="openAdminStaff()">
+        <div class="admin-card-ic">👥</div>
+        <div class="admin-card-body"><div class="t2">الموظفون والصلاحيات</div><div class="s2">مالية، دعم، مبرمجون، ومسؤولو نشر</div></div>
+        <div class="chev">‹</div>
+      </div>
+      <div class="admin-card" onclick="showScreen('admin-policies')">
+        <div class="admin-card-ic">📜</div>
+        <div class="admin-card-body"><div class="t2">السياسات</div><div class="s2">شروط البناء والتعديل والاسترجاع والخصوصية</div></div>
+        <div class="chev">‹</div>
+      </div>
+      <div class="admin-card" onclick="openAdminAudit()">
+        <div class="admin-card-ic">🛡️</div>
+        <div class="admin-card-body"><div class="t2">الأمان وسجل الإجراءات</div><div class="s2">سجل حظر المستخدمين والتغييرات الإدارية</div></div>
+        <div class="chev">‹</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ADMIN: USERS & PROJECTS ============ -->
+  <section class="screen" id="screen-admin-users">
+    <div class="topbar"><button class="btn-link" onclick="showScreen('admin')">‹ رجوع</button><div class="t">المشاريع والبناء</div><span></span></div>
+    <div class="tabs2">
+      <button class="active" id="adminSubUsersBtn" onclick="adminSwitchSub('users')">المستخدمون</button>
+      <button id="adminSubProjectsBtn" onclick="adminSwitchSub('projects')">كل المشاريع</button>
+    </div>
     <div id="adminUsersList" class="stack"></div>
+    <div id="adminProjectsList" class="stack" style="display:none;"></div>
+  </section>
+
+  <!-- ============ ADMIN: SUPPORT ============ -->
+  <section class="screen" id="screen-admin-support">
+    <div class="topbar"><button class="btn-link" onclick="showScreen('admin')">‹ رجوع</button><div class="t">خدمة العملاء</div><span></span></div>
+    <div class="card stack">
+      <div style="font-size:14px; line-height:1.8;">رسائل الدعم التي يرسلها المستخدمون من تبويب "الدعم" تصلك مباشرة وفورياً على تيليجرام — لا تحتاج لوحة منفصلة لقراءتها.</div>
+      <a class="btn btn-primary" style="text-decoration:none; text-align:center; display:block;" href="https://t.me" target="_blank">فتح تيليجرام</a>
+    </div>
+  </section>
+
+  <!-- ============ ADMIN: STAFF ============ -->
+  <section class="screen" id="screen-admin-staff">
+    <div class="topbar"><button class="btn-link" onclick="showScreen('admin')">‹ رجوع</button><div class="t">الموظفون والصلاحيات</div><span></span></div>
+    <div id="staffOwnerNote" class="card" style="display:none; margin-bottom:14px;">
+      <div style="font-size:13px; color:var(--ink-soft);">إضافة موظف يمنحه صلاحية الدخول للوحة الإدارة (باستثناء إدارة الموظفين، وهي للمالك فقط).</div>
+    </div>
+    <div id="addStaffForm" class="stack card" style="margin-bottom:16px; display:none;">
+      <input type="email" id="staffEmail" placeholder="بريد الموظف الإلكتروني">
+      <select id="staffRole" style="width:100%; background:var(--surface); border:1.5px solid var(--border); border-radius:14px; padding:14px 16px; font-family:inherit; font-size:15px; color:var(--ink);">
+        <option value="دعم">دعم</option>
+        <option value="مبرمج">مبرمج</option>
+        <option value="مالية">مالية</option>
+        <option value="مسؤول نشر">مسؤول نشر</option>
+      </select>
+      <button class="btn btn-primary" onclick="addStaff()">إضافة موظف</button>
+    </div>
+    <div id="staffList" class="stack"></div>
+  </section>
+
+  <!-- ============ ADMIN: POLICIES ============ -->
+  <section class="screen" id="screen-admin-policies">
+    <div class="topbar"><button class="btn-link" onclick="showScreen('admin')">‹ رجوع</button><div class="t">السياسات</div><span></span></div>
+    <div class="card stack" style="font-size:13.5px; line-height:2;">
+      <div><b>شروط البناء:</b> يقر المستخدم بأن الفكرة الموصوفة لا تنتهك حقوق الغير ولا تحتوي محتوى مخالفاً.</div>
+      <div><b>التعديل:</b> يمكن للمستخدم تعديل مشروعه بإعادة إنشائه بفكرة محدّثة.</div>
+      <div><b>الاسترجاع:</b> تُحفظ المشاريع في حساب المستخدم ويمكنه العودة إليها من تبويب "مشاريعي".</div>
+      <div><b>الخصوصية:</b> بيانات الحساب (البريد) وبيانات المشاريع تُخزَّن بأمان ولا تُشارك مع أي طرف ثالث.</div>
+    </div>
+  </section>
+
+  <!-- ============ ADMIN: AUDIT LOG ============ -->
+  <section class="screen" id="screen-admin-audit">
+    <div class="topbar"><button class="btn-link" onclick="showScreen('admin')">‹ رجوع</button><div class="t">سجل الإجراءات</div><span></span></div>
+    <div id="auditList" class="stack"></div>
+  </section>
+
+  <!-- ============ ADMIN: PAYMENTS ============ -->
+  <section class="screen" id="screen-admin-payments">
+    <div class="topbar"><button class="btn-link" onclick="showScreen('admin')">‹ رجوع</button><div class="t">المدفوعات والإشعارات</div><span></span></div>
+    <div id="paymentsList" class="stack"></div>
   </section>
 
   <!-- ============ ACCOUNT ============ -->
@@ -224,9 +351,47 @@
     <div class="card stack">
       <div class="acct-row"><span style="color:var(--ink-soft);">البريد الإلكتروني</span><b id="acctEmail">—</b></div>
       <div class="acct-row"><span style="color:var(--ink-soft);">عدد المشاريع</span><b id="acctCount">0</b></div>
+      <div class="acct-row"><span style="color:var(--ink-soft);">الحد المسموح</span><b id="acctLimit">3</b></div>
     </div>
     <div style="height:16px;"></div>
+    <button class="btn btn-ghost" onclick="showScreen('request-payment')">طلب زيادة عدد المشاريع</button>
+    <div style="height:12px;"></div>
+    <a href="https://wa.me/249993668386" target="_blank" class="btn" style="text-decoration:none; text-align:center; display:block; background:#25D366; color:#fff;">💬 تواصل مع المطوّر عبر واتساب</a>
+    <div style="height:12px;"></div>
     <button class="btn btn-outline" onclick="signOut()">تسجيل الخروج</button>
+  </section>
+
+  <!-- ============ REQUEST PAYMENT ============ -->
+  <section class="screen" id="screen-request-payment">
+    <div class="topbar"><button class="btn-link" onclick="showTab('account')">‹ رجوع</button><div class="t">طلب زيادة الحد</div><span></span></div>
+    <div class="stack">
+      <div class="card" style="background:var(--ink);">
+        <div style="color:#fff; font-weight:800; font-size:15px;">5 مشاريع إضافية مقابل 1000 جنيه سوداني</div>
+        <div style="color:#cfc9c0; font-size:12.5px; margin-top:4px;">حوّل المبلغ عبر إحدى الوسائل التالية، ثم ارفع صورة إشعار التحويل — سيراجع الأدمن طلبك يدوياً.</div>
+      </div>
+      <div>
+        <label class="field-label">طريقة الدفع</label>
+        <div class="row">
+          <div class="type-pick" style="opacity:.55;" onclick="showToast('سيتوفر قريباً')"><span class="ic">🏦</span> بنكك</div>
+          <div class="type-pick" id="payMethodMyCashi" onclick="pickPayMethod('ماي كاشي', this)"><span class="ic">📲</span> ماي كاشي</div>
+          <div class="type-pick" id="payMethodBravo" onclick="pickPayMethod('برافو', this)"><span class="ic">💠</span> برافو</div>
+        </div>
+      </div>
+      <div id="payAccountInfo" class="card" style="display:none; text-align:center;">
+        <div style="font-size:12.5px; color:var(--ink-soft); margin-bottom:4px;">حوّل إلى رقم الحساب</div>
+        <div id="payAccountNumber" style="font-size:20px; font-weight:900; letter-spacing:1px;">—</div>
+      </div>
+      <div>
+        <label class="field-label">ملاحظة (اختياري)</label>
+        <input type="text" id="payNote" placeholder="مثال: تم التحويل عبر ماي كاشي الساعة ٣ عصراً">
+      </div>
+      <div>
+        <label class="field-label">صورة إشعار التحويل</label>
+        <input type="file" id="payReceipt" accept="image/*">
+      </div>
+      <div class="err" id="payErr"></div>
+      <button class="btn btn-primary" id="paySubmitBtn" onclick="submitPayment()">إرسال الطلب</button>
+    </div>
   </section>
 
   <nav id="nav" style="display:none;">
@@ -246,17 +411,34 @@ const SUPABASE_KEY = "sb_publishable_epndihGLE_xvJ-MNb4A5TA_lOlG7A8e";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const ADMIN_EMAIL = "tarig0905426979@gmail.com";
-let sampleCap=null, downloadsCap=null;
 let currentUser=null;
 let isAdmin=false;
 let projects=[];
+const BASE_FREE_LIMIT = 3;
+let userExtraSlots = 0;
 let currentType='موقع إلكتروني';
 let currentGenerated=null;
 let authMode='login';
 
+const GEMINI_KEY = "AQ.Ab8RN6KaB_FIrJkM_p5dcL1MMxdrerLlcAhYE0jZAOVAgIkxPQ";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent";
+
+async function callGemini(prompt){
+  const res = await fetch(GEMINI_URL, {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json', 'X-goog-api-key':GEMINI_KEY },
+    body: JSON.stringify({ contents:[{ parts:[{ text: prompt }] }] })
+  });
+  const data = await res.json();
+  if(!res.ok) throw new Error((data.error && data.error.message) || 'gemini_error');
+  const text = data.candidates && data.candidates[0] && data.candidates[0].content &&
+    data.candidates[0].content.parts && data.candidates[0].content.parts[0] &&
+    data.candidates[0].content.parts[0].text;
+  if(!text) throw new Error('empty_response');
+  return text;
+}
+
 async function initCaps(){
-  try{ sampleCap = await window.claude.use('sample'); }catch(e){ sampleCap=null; }
-  try{ downloadsCap = await window.claude.use('downloads'); }catch(e){ downloadsCap=null; }
   const { data:{ session } } = await sb.auth.getSession();
   if(session && session.user){ currentUser = session.user; await afterLogin(); }
 }
@@ -266,7 +448,24 @@ sb.auth.onAuthStateChange((event, session)=>{
     currentUser = session.user; afterLogin();
   }
   if(event==='SIGNED_OUT'){ currentUser=null; showAuthScreen(); }
+  if(event==='PASSWORD_RECOVERY'){ showScreen('reset-password'); }
 });
+
+async function confirmNewPassword(){
+  const pw = document.getElementById('newPassword').value;
+  const errEl = document.getElementById('resetErr');
+  errEl.textContent='';
+  if(!pw || pw.length<6){ errEl.textContent='كلمة المرور يجب أن تكون 6 أحرف على الأقل'; return; }
+  try{
+    const { data, error } = await sb.auth.updateUser({ password: pw });
+    if(error) throw error;
+    showToast('تم تحديث كلمة المرور بنجاح');
+    currentUser = data.user;
+    await afterLogin();
+  }catch(err){
+    errEl.textContent='تعذّر تحديث كلمة المرور، أعد طلب الرابط وحاول مجدداً';
+  }
+}
 
 function showToast(msg){
   const t=document.getElementById('toast');
@@ -281,6 +480,19 @@ function switchAuthTab(mode){
   document.getElementById('tabSignup').classList.toggle('active', mode==='signup');
   document.getElementById('authSubmit').textContent = mode==='login' ? 'تسجيل الدخول' : 'إنشاء حساب';
   document.getElementById('authErr').textContent='';
+  document.getElementById('forgotBtn').style.display = mode==='login' ? 'block' : 'none';
+}
+
+async function forgotPassword(){
+  const email = document.getElementById('authEmail').value.trim() || prompt('اكتب بريدك الإلكتروني:');
+  if(!email) return;
+  try{
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.href.split('#')[0] });
+    if(error) throw error;
+    showToast('تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك');
+  }catch(err){
+    showToast('تعذّر إرسال رابط إعادة التعيين، تحقق من صحة البريد');
+  }
 }
 
 document.getElementById('authForm').addEventListener('submit', async (e)=>{
@@ -327,25 +539,44 @@ async function afterLogin(){
   document.getElementById('screen-auth').classList.remove('active');
   document.getElementById('nav').style.display='flex';
   document.getElementById('acctEmail').textContent = currentUser.email;
-  isAdmin = (currentUser.email === ADMIN_EMAIL);
+  isAdmin=false;
+  try{
+    const { data } = await sb.rpc('am_i_admin');
+    isAdmin = !!data;
+  }catch(e){}
   document.getElementById('navAdmin').style.display = isAdmin ? 'flex' : 'none';
   await loadProjects();
+  await loadUserLimit();
   showTab('create');
+}
+
+let currentLimit = 3;
+async function loadUserLimit(){
+  try{
+    const { data, error } = await sb.rpc('get_my_limit');
+    if(!error && typeof data === 'number') currentLimit = data;
+  }catch(e){}
+  const el = document.getElementById('acctLimit');
+  if(el) el.textContent = currentLimit;
 }
 
 async function signOut(){
   await sb.auth.signOut();
 }
 
-function showTab(tab){
+function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-'+tab).classList.add('active');
+  document.getElementById('screen-'+id).classList.add('active');
+}
+
+function showTab(tab){
+  showScreen(tab);
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
   if(tab==='projects') renderProjects();
   if(tab==='account'){ document.getElementById('acctCount').textContent=projects.length; }
-  if(tab==='admin' && isAdmin) loadAdminUsers();
+  if(tab==='admin' && isAdmin) loadAdminCounts();
   if(tab==='support' && document.getElementById('chatLog').children.length===0){
-    addMsg('bot','أهلاً بك في دعم SUDAI 👋 أخبرني كيف يمكنني مساعدتك في بناء مشروعك.');
+    addMsg('bot','أهلاً بك في دعم SUDAI 👋 اكتب رسالتك وسيصل فريق الدعم بها مباشرة.');
   }
 }
 
@@ -394,6 +625,28 @@ function openSaved(p){
   }
 }
 
+async function loadAdminCounts(){
+  try{
+    const { data, error } = await sb.rpc('admin_list_users');
+    if(error) throw error;
+    document.getElementById('adminUserCount').textContent = data.length;
+    document.getElementById('adminProjectCount').textContent = data.reduce((a,u)=>a+Number(u.project_count||0),0);
+  }catch(e){}
+}
+
+function openAdminUsers(){
+  showScreen('admin-users');
+  adminSwitchSub('users');
+}
+
+function adminSwitchSub(which){
+  document.getElementById('adminSubUsersBtn').classList.toggle('active', which==='users');
+  document.getElementById('adminSubProjectsBtn').classList.toggle('active', which==='projects');
+  document.getElementById('adminUsersList').style.display = which==='users' ? 'flex' : 'none';
+  document.getElementById('adminProjectsList').style.display = which==='projects' ? 'flex' : 'none';
+  if(which==='users') loadAdminUsers(); else loadAdminProjects();
+}
+
 async function loadAdminUsers(){
   const list=document.getElementById('adminUsersList');
   list.innerHTML = '<div class="empty">جاري التحميل...</div>';
@@ -437,13 +690,242 @@ async function toggleBan(userId, currentlyBanned, btn){
   }
 }
 
+async function loadAdminProjects(){
+  const list=document.getElementById('adminProjectsList');
+  list.innerHTML = '<div class="empty">جاري التحميل...</div>';
+  try{
+    const { data, error } = await sb.rpc('admin_list_projects');
+    if(error) throw error;
+    list.innerHTML='';
+    if(!data.length){ list.innerHTML='<div class="empty">لا توجد مشاريع بعد</div>'; return; }
+    data.forEach(p=>{
+      const div=document.createElement('div');
+      div.className='admin-row';
+      div.innerHTML =
+        '<div class="info">'+
+          '<div class="em">'+escapeHtml(p.name||'بدون اسم')+'</div>'+
+          '<div class="meta2">'+escapeHtml(p.owner_email||'')+' · '+new Date(p.created_at).toLocaleDateString('ar-EG')+'</div>'+
+        '</div>'+
+        '<button class="ban-btn ban" data-id="'+p.id+'">حذف</button>';
+      div.querySelector('button').onclick = (e)=>deleteAdminProject(p.id, e.target);
+      list.appendChild(div);
+    });
+  }catch(err){
+    list.innerHTML = '<div class="empty">تعذّر تحميل المشاريع<br>('+(err.message||'')+')</div>';
+  }
+}
+
+async function deleteAdminProject(id, btn){
+  btn.disabled=true;
+  try{
+    const { error } = await sb.rpc('admin_delete_project', { target_project_id:id });
+    if(error) throw error;
+    showToast('تم حذف المشروع');
+    await loadAdminProjects();
+    await loadAdminCounts();
+  }catch(err){
+    showToast('تعذّر حذف المشروع');
+    btn.disabled=false;
+  }
+}
+
+function openAdminStaff(){
+  showScreen('admin-staff');
+  const owner = currentUser && currentUser.email === ADMIN_EMAIL;
+  document.getElementById('addStaffForm').style.display = owner ? 'flex' : 'none';
+  document.getElementById('staffOwnerNote').style.display = owner ? 'block' : 'none';
+  loadAdminStaff();
+}
+
+async function loadAdminStaff(){
+  const list=document.getElementById('staffList');
+  list.innerHTML = '<div class="empty">جاري التحميل...</div>';
+  try{
+    const { data, error } = await sb.rpc('admin_list_staff');
+    if(error) throw error;
+    list.innerHTML='';
+    if(!data.length){ list.innerHTML='<div class="empty">لا يوجد موظفون بعد</div>'; return; }
+    const owner = currentUser && currentUser.email === ADMIN_EMAIL;
+    data.forEach(s=>{
+      const div=document.createElement('div');
+      div.className='admin-row';
+      div.innerHTML =
+        '<div class="info">'+
+          '<div class="em">'+escapeHtml(s.email)+'</div>'+
+          '<div class="meta2">'+escapeHtml(s.role)+' · '+new Date(s.created_at).toLocaleDateString('ar-EG')+'</div>'+
+        '</div>'+
+        (owner ? '<button class="ban-btn ban">إزالة</button>' : '');
+      if(owner){ div.querySelector('button').onclick = (e)=>removeStaff(s.email, e.target); }
+      list.appendChild(div);
+    });
+  }catch(err){
+    list.innerHTML = '<div class="empty">هذا القسم مخصص للمالك فقط</div>';
+  }
+}
+
+async function addStaff(){
+  const email = document.getElementById('staffEmail').value.trim();
+  const role = document.getElementById('staffRole').value;
+  if(!email){ showToast('اكتب بريد الموظف'); return; }
+  try{
+    const { error } = await sb.rpc('admin_add_staff', { staff_email:email, staff_role:role });
+    if(error) throw error;
+    document.getElementById('staffEmail').value='';
+    showToast('تمت إضافة الموظف');
+    await loadAdminStaff();
+  }catch(err){ showToast('تعذّر إضافة الموظف'); }
+}
+
+async function removeStaff(email, btn){
+  btn.disabled=true;
+  try{
+    const { error } = await sb.rpc('admin_remove_staff', { staff_email:email });
+    if(error) throw error;
+    showToast('تمت إزالة الموظف');
+    await loadAdminStaff();
+  }catch(err){ showToast('تعذّر إزالة الموظف'); btn.disabled=false; }
+}
+
+function openAdminAudit(){
+  showScreen('admin-audit');
+  loadAuditLog();
+}
+
+async function loadAuditLog(){
+  const list=document.getElementById('auditList');
+  list.innerHTML = '<div class="empty">جاري التحميل...</div>';
+  try{
+    const { data, error } = await sb.rpc('admin_list_audit');
+    if(error) throw error;
+    list.innerHTML='';
+    if(!data.length){ list.innerHTML='<div class="empty">لا توجد إجراءات مسجّلة بعد</div>'; return; }
+    data.forEach(l=>{
+      const div=document.createElement('div');
+      div.className='admin-row';
+      div.innerHTML =
+        '<div class="info">'+
+          '<div class="em">'+escapeHtml(l.action)+(l.target_email?(' — '+escapeHtml(l.target_email)):'')+'</div>'+
+          '<div class="meta2">'+escapeHtml(l.actor_email)+' · '+new Date(l.created_at).toLocaleString('ar-EG')+'</div>'+
+        '</div>';
+      list.appendChild(div);
+    });
+  }catch(err){
+    list.innerHTML = '<div class="empty">تعذّر تحميل السجل</div>';
+  }
+}
+
+const MYCASHI_ACCOUNT = "400130532";
+const BRAVO_ACCOUNT = "74436006";
+let selectedPayMethod = null;
+
+function pickPayMethod(method, el){
+  document.querySelectorAll('#screen-request-payment .type-pick').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedPayMethod = method;
+  document.getElementById('payAccountInfo').style.display='block';
+  document.getElementById('payAccountNumber').textContent = method==='ماي كاشي' ? MYCASHI_ACCOUNT : BRAVO_ACCOUNT;
+}
+
+async function submitPayment(){
+  const errEl = document.getElementById('payErr');
+  errEl.textContent='';
+  const note = document.getElementById('payNote').value.trim();
+  const fileInput = document.getElementById('payReceipt');
+  const file = fileInput.files && fileInput.files[0];
+  if(!selectedPayMethod){ errEl.textContent='اختر طريقة الدفع أولاً'; return; }
+  if(!file){ errEl.textContent='ارفع صورة إشعار التحويل'; return; }
+  const btn=document.getElementById('paySubmitBtn');
+  btn.disabled=true;
+  try{
+    const path = currentUser.id+'/'+Date.now()+'_'+file.name.replace(/[^a-zA-Z0-9._-]/g,'');
+    const { error: upErr } = await sb.storage.from('receipts').upload(path, file);
+    if(upErr) throw upErr;
+    const { error: insErr } = await sb.from('payment_requests').insert({
+      method: selectedPayMethod, amount: 1000, receipt_url: path, note: note
+    });
+    if(insErr) throw insErr;
+    showToast('تم إرسال طلبك بنجاح، سيراجعه الأدمن قريباً');
+    document.getElementById('payNote').value='';
+    fileInput.value='';
+    document.querySelectorAll('#screen-request-payment .type-pick').forEach(p=>p.classList.remove('selected'));
+    document.getElementById('payAccountInfo').style.display='none';
+    selectedPayMethod=null;
+    showTab('account');
+  }catch(err){
+    errEl.textContent='تعذّر إرسال الطلب، حاول مرة أخرى';
+  }
+  btn.disabled=false;
+}
+
+function openAdminPayments(){
+  showScreen('admin-payments');
+  loadAdminPayments();
+}
+
+async function loadAdminPayments(){
+  const list=document.getElementById('paymentsList');
+  list.innerHTML = '<div class="empty">جاري التحميل...</div>';
+  try{
+    const { data, error } = await sb.rpc('admin_list_payments');
+    if(error) throw error;
+    list.innerHTML='';
+    if(!data.length){ list.innerHTML='<div class="empty">لا توجد طلبات دفع بعد</div>'; return; }
+    for(const p of data){
+      const div=document.createElement('div');
+      div.className='admin-row';
+      div.style.flexDirection='column';
+      div.style.alignItems='stretch';
+      let receiptLink='';
+      try{
+        const { data:signed } = await sb.storage.from('receipts').createSignedUrl(p.receipt_url, 120);
+        if(signed && signed.signedUrl) receiptLink = '<a href="'+signed.signedUrl+'" target="_blank" style="color:var(--orange-deep); font-weight:700; font-size:12.5px;">عرض صورة الإشعار</a>';
+      }catch(e){}
+      const statusLabel = p.status==='approved' ? '<span style="color:#2E8B57; font-weight:700;">معتمد</span>' :
+        p.status==='rejected' ? '<span class="status-banned">مرفوض</span>' : '<span style="color:var(--orange-deep); font-weight:700;">قيد المراجعة</span>';
+      div.innerHTML =
+        '<div class="em">'+escapeHtml(p.user_email)+'</div>'+
+        '<div class="meta2">'+escapeHtml(p.method)+' · '+p.amount+' جنيه · '+statusLabel+'</div>'+
+        (p.note ? '<div class="meta2">ملاحظة: '+escapeHtml(p.note)+'</div>' : '')+
+        '<div class="meta2">'+new Date(p.created_at).toLocaleString('ar-EG')+'</div>'+
+        '<div style="margin-top:8px;">'+receiptLink+'</div>'+
+        (p.status==='pending' ? '<div class="row" style="margin-top:10px;">'+
+          '<button class="ban-btn unban" style="flex:1;" data-act="approve">اعتماد (+5)</button>'+
+          '<button class="ban-btn ban" style="flex:1;" data-act="reject">رفض</button>'+
+        '</div>' : '');
+      if(p.status==='pending'){
+        div.querySelector('[data-act="approve"]').onclick=(e)=>reviewPayment(p.id, true, e.target);
+        div.querySelector('[data-act="reject"]').onclick=(e)=>reviewPayment(p.id, false, e.target);
+      }
+      list.appendChild(div);
+    }
+  }catch(err){
+    list.innerHTML = '<div class="empty">تعذّر تحميل طلبات الدفع</div>';
+  }
+}
+
+async function reviewPayment(id, approve, btn){
+  btn.disabled=true;
+  try{
+    const { error } = await sb.rpc('admin_review_payment', { request_id:id, approve:approve, added_projects:5 });
+    if(error) throw error;
+    showToast(approve ? 'تم اعتماد الدفعة' : 'تم رفض الطلب');
+    await loadAdminPayments();
+  }catch(err){
+    showToast('تعذّر تنفيذ العملية');
+    btn.disabled=false;
+  }
+}
+
 function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 async function generate(){
   const name=document.getElementById('projName').value.trim()||'مشروعي';
   const idea=document.getElementById('ideaInput').value.trim();
   if(!idea){ showToast('اكتب فكرة المشروع أولاً'); return; }
-  if(!sampleCap){ showToast('ميزة التوليد غير متاحة حالياً'); return; }
+  if(projects.length >= currentLimit){
+    showToast('وصلت للحد المسموح ('+currentLimit+') — يمكنك طلب زيادة من تبويب حسابي');
+    return;
+  }
 
   const btn=document.getElementById('genBtn');
   btn.disabled=true;
@@ -454,13 +936,8 @@ async function generate(){
   const prompt = "أنت مولّد مواقع وتطبيقات. أنشئ ملف HTML واحد متكامل ومستقل (يحتوي CSS وJS بداخله فقط، بدون أي روابط خارجية) يمثل نسخة تجريبية عاملة وحديثة من الفكرة التالية.\nنوع المنتج: "+currentType+"\nاسم المشروع: "+name+"\nوصف الفكرة: "+idea+"\n\nالمتطلبات:\n- تصميم حديث وعملي، متجاوب مع الجوال، بواجهة عربية (dir=\"rtl\") إن كانت الفكرة بالعربية.\n- اجعله تفاعلياً قدر الإمكان باستخدام JavaScript بسيط داخل الملف (بدون طلبات شبكة خارجية).\n- أرجع فقط كود HTML كاملاً بدءاً من <!DOCTYPE html> بدون أي شرح أو نص إضافي أو علامات markdown.";
 
   try{
-    const res = await sampleCap(prompt, {
-      modelTier:'complex',
-      cache:false,
-      onText:({text})=>{ document.getElementById('genStatusText').textContent='جاري البناء... ('+text.length+' حرف)'; }
-    });
-    let html = (res.text||'').trim();
-    html = html.replace(/^```(?:html)?/i,'').replace(/```$/,'').trim();
+    let html = await callGemini(prompt);
+    html = html.trim().replace(/^```(?:html)?/i,'').replace(/```$/,'').trim();
     if(!/^<!DOCTYPE|^<html/i.test(html)){
       showToast('تعذّر بناء نسخة صالحة، حاول صياغة الفكرة بشكل أوضح');
       document.getElementById('genStatus').style.display='none';
@@ -469,12 +946,17 @@ async function generate(){
     }
     document.getElementById('previewFrame').srcdoc=html;
     document.getElementById('previewWrap').style.display='flex';
-    if(res.truncated) showToast('تم قص الناتج، قد تحتاج فكرة أبسط لنتيجة كاملة');
 
     const record = { name, idea, type:currentType, html };
     const { data, error } = await sb.from('projects').insert(record).select().single();
-    if(!error && data){ currentGenerated=data; projects.unshift(data); }
-    else { currentGenerated=record; }
+    if(!error && data){
+      currentGenerated=data; projects.unshift(data);
+    } else if(error && /project_limit_reached/i.test(error.message||'')){
+      showToast('وصلت للحد المسموح من المشاريع، يمكنك طلب زيادة من تبويب حسابي');
+      document.getElementById('previewWrap').style.display='none';
+    } else {
+      currentGenerated=record;
+    }
   }catch(err){
     showToast('حدث خطأ أثناء التوليد، حاول مرة أخرى');
   }
@@ -482,12 +964,17 @@ async function generate(){
   btn.disabled=false;
 }
 
-async function downloadCurrent(){
+function downloadCurrent(){
   if(!currentGenerated || !currentGenerated.html){ return; }
-  if(!downloadsCap){ showToast('التنزيل غير متاح في هذه الجلسة'); return; }
-  try{
-    await downloadsCap.save({ filename:(currentGenerated.name||'project')+'.html', data:currentGenerated.html });
-  }catch(e){ showToast('تعذّر حفظ الملف'); }
+  const blob = new Blob([currentGenerated.html], { type:'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (currentGenerated.name||'project')+'.html';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
 }
 
 function resetCreate(){
@@ -506,21 +993,29 @@ function addMsg(who,text){
   log.scrollTop=log.scrollHeight;
 }
 
+const TG_TOKEN = "8853019567:AAGHlwqZbkdULEK7OE1BrFO-ZFByYYDTf4U";
+const TG_CHAT_ID = "8248472364";
+
 async function sendChat(){
   const inp=document.getElementById('chatInput');
   const val=inp.value.trim();
   if(!val) return;
   addMsg('user',val);
   inp.value='';
-  if(!sampleCap){ addMsg('bot','عذراً، الدعم الذكي غير متاح حالياً.'); return; }
   addMsg('bot','...');
   const log=document.getElementById('chatLog');
   const placeholder=log.lastChild;
   try{
-    const res = await sampleCap("أنت مساعد دعم تطبيق SUDAI لبناء المواقع والتطبيقات بالذكاء الاصطناعي. أجب باختصار ووضوح بالعربية على سؤال المستخدم التالي:\n"+val, { modelTier:'quick' });
-    placeholder.textContent = res.text || 'حدث خطأ في الرد.';
+    const text = "رسالة دعم جديدة من SUDAI\nالبريد: "+(currentUser?currentUser.email:'غير مسجل')+"\n\n"+val;
+    const res = await fetch("https://api.telegram.org/bot"+TG_TOKEN+"/sendMessage", {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ chat_id: TG_CHAT_ID, text: text })
+    });
+    if(!res.ok) throw new Error('failed');
+    placeholder.textContent='تم إرسال رسالتك بنجاح ✅ سيتواصل معك فريق الدعم قريباً.';
   }catch(e){
-    placeholder.textContent='تعذّر الاتصال بالدعم الآن.';
+    placeholder.textContent='تعذّر إرسال الرسالة، تحقق من الإنترنت وحاول مرة أخرى.';
   }
 }
 
