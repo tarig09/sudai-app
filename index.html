@@ -10,20 +10,23 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
   :root{
-    --bg:#FAF8F5; --surface:#FFFFFF; --ink:#1C1A17; --ink-soft:#7A756D;
-    --orange:#F17B21; --orange-deep:#D9660D; --orange-tint:#FFF0DF;
-    --border:#EDE6DC; --danger:#D64545; --radius:20px;
+    --bg:#FAF8F5; --surface:#FFFFFF; --surface-2:#FBF4EC; --ink:#1C1A17; --ink-soft:#7A756D;
+    --orange:#F17B21; --orange-deep:#C6530A; --orange-glow:#FF9A48; --orange-tint:#FFF0DF;
+    --gold:#E8B84B; --border:#EDE6DC; --danger:#D64545; --radius:20px;
+    --shadow-card:0 2px 10px -4px rgba(28,26,23,.08);
     box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --bg:#141210; --surface:#1E1B18; --ink:#F3EEE7; --ink-soft:#9A948B;
-      --orange:#F98A34; --orange-deep:#D9660D; --orange-tint:#2B1D10; --border:#2E2A25;
+      --bg:#0F0D0C; --surface:#1C1815; --surface-2:#241E19; --ink:#F5EFE6; --ink-soft:#9C9388;
+      --orange:#FF8A3D; --orange-deep:#D9660D; --orange-glow:#FFB06B; --orange-tint:#2E1D10;
+      --gold:#F0C563; --border:#312A23; --shadow-card:0 2px 14px -6px rgba(0,0,0,.5);
     }
   }
   :root[data-theme="dark"]{
-    --bg:#141210; --surface:#1E1B18; --ink:#F3EEE7; --ink-soft:#9A948B;
-    --orange:#F98A34; --orange-deep:#D9660D; --orange-tint:#2B1D10; --border:#2E2A25;
+    --bg:#0F0D0C; --surface:#1C1815; --surface-2:#241E19; --ink:#F5EFE6; --ink-soft:#9C9388;
+    --orange:#FF8A3D; --orange-deep:#D9660D; --orange-glow:#FFB06B; --orange-tint:#2E1D10;
+    --gold:#F0C563; --border:#312A23; --shadow-card:0 2px 14px -6px rgba(0,0,0,.5);
   }
   html,body{height:100%;}
   *{box-sizing:border-box;}
@@ -44,21 +47,21 @@
     padding:14px 16px; font-family:inherit; font-size:15px; color:var(--ink); outline:none; transition:border-color .15s ease; }
   input:focus, textarea:focus{ border-color:var(--orange); }
   textarea{ min-height:120px; resize:vertical; line-height:1.6; }
-  .btn{ border:none; border-radius:16px; padding:16px; font-family:inherit; font-size:15.5px; font-weight:800;
+  .btn{ border:none; border-radius:100px; padding:16px 20px; font-family:inherit; font-size:15.5px; font-weight:800;
     cursor:pointer; width:100%; transition:transform .12s ease, opacity .15s ease, box-shadow .15s ease, filter .15s ease;
-    display:flex; align-items:center; justify-content:center; gap:8px; letter-spacing:.2px; }
+    display:flex; align-items:center; justify-content:center; gap:8px; letter-spacing:.2px; position:relative; }
   .btn:active{ transform:scale(0.97); filter:brightness(.97); }
   .btn:disabled{ opacity:.5; cursor:default; transform:none; }
-  .btn-primary{ background:linear-gradient(135deg, var(--orange), var(--orange-deep)); color:#fff;
-    box-shadow:0 10px 24px -10px rgba(241,123,33,.65); }
-  .btn-ghost{ background:var(--orange-tint); color:var(--orange-deep); }
+  .btn-primary{ background:linear-gradient(135deg, var(--orange-glow), var(--orange) 55%, var(--orange-deep)); color:#fff;
+    box-shadow:0 12px 26px -10px rgba(217,102,13,.55), inset 0 1px 0 rgba(255,255,255,.25); }
+  .btn-ghost{ background:var(--orange-tint); color:var(--orange-deep); border-radius:16px; }
   .btn-ghost:active{ filter:brightness(.95); }
-  .btn-outline{ background:var(--surface); border:1.5px solid var(--border); color:var(--ink); }
+  .btn-outline{ background:var(--surface); border:1.5px solid var(--border); color:var(--ink); border-radius:16px; }
   .btn-link{ background:none; border:none; color:var(--orange-deep); font-family:inherit; font-weight:700; font-size:13.5px; cursor:pointer; padding:6px; }
   .stack{ display:flex; flex-direction:column; gap:14px; }
   .row{ display:flex; gap:12px; }
   .row > *{ flex:1; }
-  .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px; }
+  .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow-card); }
   .type-pick{ display:flex; flex-direction:column; align-items:center; gap:8px; padding:18px 10px;
     border:1.5px solid var(--border); border-radius:16px; cursor:pointer; background:var(--surface);
     font-size:13.5px; font-weight:700; color:var(--ink-soft); transition:all .15s ease; }
@@ -95,9 +98,9 @@
   .msg{ max-width:82%; padding:12px 14px; border-radius:16px; font-size:14.5px; line-height:1.7; }
   .msg.bot{ background:var(--surface); border:1px solid var(--border); align-self:flex-start; border-bottom-right-radius:4px; }
   .msg.user{ background:var(--orange); color:#fff; align-self:flex-end; border-bottom-left-radius:4px; }
-  #chatBar{ position:sticky; bottom:0; display:flex; gap:8px; padding-top:10px; background:var(--bg); }
-  #chatBar input{ flex:1; }
-  #chatBar button{ width:46px; height:46px; border-radius:50%; background:var(--orange); color:#fff; border:none; font-size:17px; flex:none; }
+  #chatBar, .chatbar{ position:sticky; bottom:0; display:flex; gap:8px; padding-top:10px; background:var(--bg); }
+  #chatBar input, .chatbar input{ flex:1; }
+  #chatBar button, .chatbar button{ width:46px; height:46px; border-radius:50%; background:var(--orange); color:#fff; border:none; font-size:17px; flex:none; }
   .toast{ position:fixed; bottom:96px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--bg);
     padding:10px 18px; border-radius:100px; font-size:13.5px; opacity:0; pointer-events:none;
     transition:opacity .25s ease, transform .25s ease; z-index:50; white-space:nowrap; text-align:center; max-width:88%; }
@@ -129,38 +132,48 @@
   .tabs2 button{ flex:1; padding:10px; border-radius:12px; border:1.5px solid var(--border); background:var(--surface);
     font-family:inherit; font-weight:700; font-size:13.5px; color:var(--ink-soft); cursor:pointer; }
   .tabs2 button.active{ border-color:var(--orange); color:var(--orange-deep); background:var(--orange-tint); }
+  #topControls{ display:flex; justify-content:flex-end; gap:8px; padding:10px 20px 0; }
+  .icon-btn{ width:40px; height:40px; border-radius:50%; border:1px solid var(--border); background:var(--surface);
+    color:var(--ink); font-size:14.5px; font-weight:800; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; box-shadow:var(--shadow-card); transition:transform .1s ease; font-family:inherit; }
+  .icon-btn:active{ transform:scale(.93); }
 </style>
 </head>
 <body>
 <div id="app">
 
+  <div id="topControls">
+    <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Theme">🌙</button>
+    <button class="icon-btn" id="langToggleBtn" onclick="toggleLang()" title="Language">EN</button>
+  </div>
+
   <!-- ============ AUTH ============ -->
   <section class="screen active" id="screen-auth">
     <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
       <div class="brand">
-        <svg class="brand-mark" viewBox="0 0 100 100"><path d="M30 30 L50 50 L30 70" stroke="#1C1A17" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M70 30 L50 50 L70 70" stroke="#F17B21" stroke-width="12" fill="none" stroke-linecap="round"/></svg>
+        <svg class="brand-mark" viewBox="0 0 100 100"><path d="M30 30 L50 50 L30 70" style="stroke:var(--ink)" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M70 30 L50 50 L70 70" style="stroke:var(--orange)" stroke-width="12" fill="none" stroke-linecap="round"/></svg>
         <div class="brand-name">SUD<b>AI</b></div>
       </div>
-      <h1 class="hero" style="text-align:center;">حوّل فكرتك إلى منتج حقيقي</h1>
-      <p class="sub" style="text-align:center;">سجّل الدخول أو أنشئ حساباً للمتابعة</p>
+      <h1 class="hero" style="text-align:center;" data-i18n="auth_hero">حوّل فكرتك إلى منتج حقيقي</h1>
+      <p class="sub" style="text-align:center;" data-i18n="auth_sub">سجّل الدخول أو أنشئ حساباً للمتابعة</p>
       <div class="tabs2">
-        <button class="active" id="tabLogin" onclick="switchAuthTab('login')">تسجيل الدخول</button>
-        <button id="tabSignup" onclick="switchAuthTab('signup')">إنشاء حساب</button>
+        <button class="active" id="tabLogin" onclick="switchAuthTab('login')" data-i18n="tab_login">تسجيل الدخول</button>
+        <button id="tabSignup" onclick="switchAuthTab('signup')" data-i18n="tab_signup">إنشاء حساب</button>
       </div>
       <form class="stack" id="authForm">
         <div>
-          <label class="field-label">البريد الإلكتروني</label>
+          <label class="field-label" data-i18n="label_email">البريد الإلكتروني</label>
           <input type="email" id="authEmail" required>
         </div>
         <div>
-          <label class="field-label">كلمة المرور</label>
+          <label class="field-label" data-i18n="label_password">كلمة المرور</label>
           <input type="password" id="authPassword" required minlength="6">
         </div>
         <div class="err" id="authErr"></div>
-        <button class="btn btn-primary" type="submit" id="authSubmit">تسجيل الدخول</button>
+        <button class="btn btn-primary" type="submit" id="authSubmit" data-i18n="tab_login">تسجيل الدخول</button>
       </form>
-      <button class="btn-link" id="forgotBtn" style="margin-top:6px;" onclick="forgotPassword()">هل نسيت كلمة المرور؟</button>
-      <a href="https://wa.me/249993668386" target="_blank" class="btn" style="text-decoration:none; text-align:center; display:block; margin-top:14px; background:#25D366; color:#fff;">💬 تواصل مع المطوّر عبر واتساب</a>
+      <button class="btn-link" id="forgotBtn" style="margin-top:6px;" onclick="forgotPassword()" data-i18n="forgot_pw">هل نسيت كلمة المرور؟</button>
+      <a href="https://wa.me/249993668386" target="_blank" class="btn" style="text-decoration:none; text-align:center; display:block; margin-top:14px; background:#25D366; color:#fff;">💬 <span data-i18n="whatsapp_dev">تواصل مع المطوّر عبر واتساب</span></a>
     </div>
   </section>
 
@@ -168,17 +181,17 @@
   <section class="screen" id="screen-reset-password">
     <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
       <div class="brand">
-        <svg class="brand-mark" viewBox="0 0 100 100"><path d="M30 30 L50 50 L30 70" stroke="#1C1A17" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M70 30 L50 50 L70 70" stroke="#F17B21" stroke-width="12" fill="none" stroke-linecap="round"/></svg>
+        <svg class="brand-mark" viewBox="0 0 100 100"><path d="M30 30 L50 50 L30 70" style="stroke:var(--ink)" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M70 30 L50 50 L70 70" style="stroke:var(--orange)" stroke-width="12" fill="none" stroke-linecap="round"/></svg>
         <div class="brand-name">SUD<b>AI</b></div>
       </div>
-      <h1 class="hero" style="text-align:center;">تعيين كلمة مرور جديدة</h1>
+      <h1 class="hero" style="text-align:center;" data-i18n="reset_hero">تعيين كلمة مرور جديدة</h1>
       <div class="stack">
         <div>
-          <label class="field-label">كلمة المرور الجديدة</label>
+          <label class="field-label" data-i18n="label_new_password">كلمة المرور الجديدة</label>
           <input type="password" id="newPassword" minlength="6">
         </div>
         <div class="err" id="resetErr"></div>
-        <button class="btn btn-primary" onclick="confirmNewPassword()">تحديث كلمة المرور</button>
+        <button class="btn btn-primary" onclick="confirmNewPassword()" data-i18n="btn_update_password">تحديث كلمة المرور</button>
       </div>
     </div>
   </section>
@@ -186,37 +199,37 @@
   <!-- ============ CREATE ============ -->
   <section class="screen" id="screen-create">
     <div class="topbar">
-      <div class="t">إنشاء مشروع</div>
-      <div class="badge">بالذكاء الاصطناعي</div>
+      <div class="t" data-i18n="create_title">إنشاء مشروع</div>
+      <div class="badge" data-i18n="badge_ai">بالذكاء الاصطناعي</div>
     </div>
     <div class="card stack" style="background:var(--ink); margin-bottom:18px;">
-      <div style="color:#fff; font-weight:800; font-size:16px; line-height:1.6;">حوّل فكرتك إلى منتج حقيقي</div>
-      <div style="color:#cfc9c0; font-size:13px; line-height:1.7;">اكتب فكرتك وسنبني لك نسخة تجريبية عاملة يمكنك معاينتها وتنزيلها فوراً.</div>
+      <div style="color:#fff; font-weight:800; font-size:16px; line-height:1.6;" data-i18n="create_banner_title">حوّل فكرتك إلى منتج حقيقي</div>
+      <div style="color:#cfc9c0; font-size:13px; line-height:1.7;" data-i18n="create_banner_sub">اكتب فكرتك وسنبني لك نسخة تجريبية عاملة يمكنك معاينتها وتنزيلها فوراً.</div>
     </div>
     <div class="stack">
       <div>
-        <label class="field-label">نوع المشروع</label>
+        <label class="field-label" data-i18n="label_type">نوع المشروع</label>
         <div class="row">
-          <div class="type-pick selected" data-type="موقع إلكتروني" onclick="pickType(this)"><span class="ic">🌐</span> موقع إلكتروني</div>
-          <div class="type-pick" data-type="تطبيق جوال" style="opacity:.6;" onclick="showToast('سيتوفر قريباً')"><span class="ic">📱</span> تطبيق جوال</div>
+          <div class="type-pick selected" data-type="موقع إلكتروني" onclick="pickType(this)"><span class="ic">🌐</span> <span data-i18n="type_site">موقع إلكتروني</span></div>
+          <div class="type-pick" data-type="تطبيق جوال" style="opacity:.6;" onclick="showToast(tr('coming_soon'))"><span class="ic">📱</span> <span data-i18n="type_app">تطبيق جوال</span></div>
         </div>
       </div>
       <div>
-        <label class="field-label">اسم المشروع</label>
-        <input type="text" id="projName" placeholder="مثال: متجر القهوة">
+        <label class="field-label" data-i18n="label_project_name">اسم المشروع</label>
+        <input type="text" id="projName" placeholder="مثال: متجر القهوة" data-i18n-ph="ph_project_name">
       </div>
       <div>
-        <label class="field-label">صف فكرتك بالتفصيل</label>
-        <textarea id="ideaInput" placeholder="مثال: موقع لعرض قائمة قهوة مع صفحة عن المقهى وطريقة للتواصل عبر واتساب..."></textarea>
+        <label class="field-label" data-i18n="label_idea">صف فكرتك بالتفصيل</label>
+        <textarea id="ideaInput" placeholder="مثال: موقع لعرض قائمة قهوة مع صفحة عن المقهى وطريقة للتواصل عبر واتساب..." data-i18n-ph="ph_idea"></textarea>
       </div>
-      <button class="btn btn-primary" id="genBtn" onclick="generate()">✨ إنشاء التصور</button>
-      <div id="genStatus" style="display:none;"><div class="spinner"></div><span id="genStatusText">جاري البناء...</span></div>
+      <button class="btn btn-primary" id="genBtn" onclick="generate()">✨ <span data-i18n="btn_generate">إنشاء التصور</span></button>
+      <div id="genStatus" style="display:none;"><div class="spinner"></div><span id="genStatusText" data-i18n="status_building">جاري البناء...</span></div>
       <div id="previewWrap" class="stack">
-        <label class="field-label">المعاينة</label>
+        <label class="field-label" data-i18n="label_preview">المعاينة</label>
         <iframe id="previewFrame" sandbox="allow-scripts allow-same-origin"></iframe>
         <div class="row">
-          <button class="btn btn-ghost" onclick="downloadCurrent()">⬇️ تنزيل الملف</button>
-          <button class="btn btn-outline" onclick="resetCreate()">مشروع جديد</button>
+          <button class="btn btn-ghost" onclick="downloadCurrent()">⬇️ <span data-i18n="btn_download">تنزيل الملف</span></button>
+          <button class="btn btn-outline" onclick="resetCreate()" data-i18n="btn_new_project">مشروع جديد</button>
         </div>
       </div>
     </div>
@@ -224,16 +237,16 @@
 
   <!-- ============ PROJECTS ============ -->
   <section class="screen" id="screen-projects">
-    <div class="topbar"><div class="t">مشاريعي</div></div>
+    <div class="topbar"><div class="t" data-i18n="nav_projects">مشاريعي</div></div>
     <div id="projectsList" class="stack"></div>
   </section>
 
   <!-- ============ SUPPORT ============ -->
   <section class="screen" id="screen-support">
-    <div class="topbar"><div class="t">الدعم</div></div>
+    <div class="topbar"><div class="t" data-i18n="nav_support">الدعم</div></div>
     <div id="chatLog"></div>
     <div id="chatBar">
-      <input type="text" id="chatInput" placeholder="اكتب رسالتك..." onkeydown="if(event.key==='Enter')sendChat()">
+      <input type="text" id="chatInput" placeholder="اكتب رسالتك..." data-i18n-ph="ph_chat" onkeydown="if(event.key==='Enter')sendChat()">
       <button onclick="sendChat()">➤</button>
     </div>
   </section>
@@ -267,7 +280,7 @@
         <div class="admin-card-body"><div class="t2">طلبات النشر</div><div class="s2">فقط المشاريع التي منح أصحابها تفويضاً</div></div>
         <div class="chev">‹</div>
       </div>
-      <div class="admin-card" onclick="showScreen('admin-support')">
+      <div class="admin-card" onclick="openAdminSupport()">
         <div class="admin-card-ic">🎧</div>
         <div class="admin-card-body"><div class="t2">خدمة العملاء والمراجعات</div><div class="s2">التذاكر والنزاعات وتحويلها لمختص</div></div>
         <div class="chev">‹</div>
@@ -304,9 +317,15 @@
   <!-- ============ ADMIN: SUPPORT ============ -->
   <section class="screen" id="screen-admin-support">
     <div class="topbar"><button class="btn-link" onclick="showScreen('admin')">‹ رجوع</button><div class="t">خدمة العملاء</div><span></span></div>
-    <div class="card stack">
-      <div style="font-size:14px; line-height:1.8;">رسائل الدعم التي يرسلها المستخدمون من تبويب "الدعم" تصلك مباشرة وفورياً على تيليجرام — لا تحتاج لوحة منفصلة لقراءتها.</div>
-      <a class="btn btn-primary" style="text-decoration:none; text-align:center; display:block;" href="https://t.me" target="_blank">فتح تيليجرام</a>
+    <div id="adminSupportList" class="stack"></div>
+  </section>
+
+  <section class="screen" id="screen-admin-support-thread" style="padding-bottom:16px;">
+    <div class="topbar"><button class="btn-link" onclick="stopAdminThreadPolling();showScreen('admin-support')">‹ رجوع</button><div class="t" id="supportThreadTitle">محادثة</div><span></span></div>
+    <div id="adminChatLog" style="flex:1; display:flex; flex-direction:column; gap:12px; overflow-y:auto; padding-bottom:12px;"></div>
+    <div class="chatbar">
+      <input type="text" id="adminChatInput" placeholder="اكتب ردك..." onkeydown="if(event.key==='Enter')adminSendReply()">
+      <button onclick="adminSendReply()">➤</button>
     </div>
   </section>
 
@@ -354,59 +373,59 @@
 
   <!-- ============ ACCOUNT ============ -->
   <section class="screen" id="screen-account">
-    <div class="topbar"><div class="t">حسابي</div></div>
+    <div class="topbar"><div class="t" data-i18n="nav_account">حسابي</div></div>
     <div class="card stack">
-      <div class="acct-row"><span style="color:var(--ink-soft);">البريد الإلكتروني</span><b id="acctEmail">—</b></div>
-      <div class="acct-row"><span style="color:var(--ink-soft);">عدد المشاريع</span><b id="acctCount">0</b></div>
-      <div class="acct-row"><span style="color:var(--ink-soft);">الحد المسموح</span><b id="acctLimit">3</b></div>
+      <div class="acct-row"><span style="color:var(--ink-soft);" data-i18n="acct_email">البريد الإلكتروني</span><b id="acctEmail">—</b></div>
+      <div class="acct-row"><span style="color:var(--ink-soft);" data-i18n="acct_count">عدد المشاريع</span><b id="acctCount">0</b></div>
+      <div class="acct-row"><span style="color:var(--ink-soft);" data-i18n="acct_limit">الحد المسموح</span><b id="acctLimit">3</b></div>
     </div>
     <div style="height:16px;"></div>
-    <button class="btn btn-ghost" onclick="showScreen('request-payment')">طلب زيادة عدد المشاريع</button>
+    <button class="btn btn-ghost" onclick="showScreen('request-payment')" data-i18n="btn_request_increase">طلب زيادة عدد المشاريع</button>
     <div style="height:12px;"></div>
-    <a href="https://wa.me/249993668386" target="_blank" class="btn" style="text-decoration:none; text-align:center; display:block; background:#25D366; color:#fff;">💬 تواصل مع المطوّر عبر واتساب</a>
+    <a href="https://wa.me/249993668386" target="_blank" class="btn" style="text-decoration:none; text-align:center; display:block; background:#25D366; color:#fff;">💬 <span data-i18n="whatsapp_dev">تواصل مع المطوّر عبر واتساب</span></a>
     <div style="height:12px;"></div>
-    <button class="btn btn-outline" onclick="signOut()">تسجيل الخروج</button>
+    <button class="btn btn-outline" onclick="signOut()" data-i18n="btn_logout">تسجيل الخروج</button>
   </section>
 
   <!-- ============ REQUEST PAYMENT ============ -->
   <section class="screen" id="screen-request-payment">
-    <div class="topbar"><button class="btn-link" onclick="showTab('account')">‹ رجوع</button><div class="t">طلب زيادة الحد</div><span></span></div>
+    <div class="topbar"><button class="btn-link" onclick="showTab('account')">‹ رجوع</button><div class="t" data-i18n="payment_title">طلب زيادة الحد</div><span></span></div>
     <div class="stack">
       <div class="card" style="background:var(--ink);">
-        <div style="color:#fff; font-weight:800; font-size:15px;">5 مشاريع إضافية مقابل 1000 جنيه سوداني</div>
-        <div style="color:#cfc9c0; font-size:12.5px; margin-top:4px;">حوّل المبلغ عبر إحدى الوسائل التالية، ثم ارفع صورة إشعار التحويل — سيراجع الأدمن طلبك يدوياً.</div>
+        <div style="color:#fff; font-weight:800; font-size:15px;" data-i18n="payment_banner_title">5 مشاريع إضافية مقابل 1000 جنيه سوداني</div>
+        <div style="color:#cfc9c0; font-size:12.5px; margin-top:4px;" data-i18n="payment_banner_sub">حوّل المبلغ عبر إحدى الوسائل التالية، ثم ارفع صورة إشعار التحويل — سيراجع الأدمن طلبك يدوياً.</div>
       </div>
       <div>
-        <label class="field-label">طريقة الدفع</label>
+        <label class="field-label" data-i18n="label_pay_method">طريقة الدفع</label>
         <div class="row">
-          <div class="type-pick" style="opacity:.55;" onclick="showToast('سيتوفر قريباً')"><span class="ic">🏦</span> بنكك</div>
-          <div class="type-pick" id="payMethodMyCashi" onclick="pickPayMethod('ماي كاشي', this)"><span class="ic">📲</span> ماي كاشي</div>
-          <div class="type-pick" id="payMethodBravo" onclick="pickPayMethod('برافو', this)"><span class="ic">💠</span> برافو</div>
+          <div class="type-pick" style="opacity:.55;" onclick="showToast(tr('coming_soon'))"><span class="ic">🏦</span> <span data-i18n="pay_bankak">بنكك</span></div>
+          <div class="type-pick" id="payMethodMyCashi" onclick="pickPayMethod('ماي كاشي', this)"><span class="ic">📲</span> <span data-i18n="pay_mycashi">ماي كاشي</span></div>
+          <div class="type-pick" id="payMethodBravo" onclick="pickPayMethod('برافو', this)"><span class="ic">💠</span> <span data-i18n="pay_bravo">برافو</span></div>
         </div>
       </div>
       <div id="payAccountInfo" class="card" style="display:none; text-align:center;">
-        <div style="font-size:12.5px; color:var(--ink-soft); margin-bottom:4px;">حوّل إلى رقم الحساب</div>
+        <div style="font-size:12.5px; color:var(--ink-soft); margin-bottom:4px;" data-i18n="pay_transfer_to">حوّل إلى رقم الحساب</div>
         <div id="payAccountNumber" style="font-size:20px; font-weight:900; letter-spacing:1px;">—</div>
       </div>
       <div>
-        <label class="field-label">ملاحظة (اختياري)</label>
-        <input type="text" id="payNote" placeholder="مثال: تم التحويل عبر ماي كاشي الساعة ٣ عصراً">
+        <label class="field-label" data-i18n="label_note_optional">ملاحظة (اختياري)</label>
+        <input type="text" id="payNote" placeholder="مثال: تم التحويل عبر ماي كاشي الساعة ٣ عصراً" data-i18n-ph="ph_pay_note">
       </div>
       <div>
-        <label class="field-label">صورة إشعار التحويل</label>
+        <label class="field-label" data-i18n="label_receipt">صورة إشعار التحويل</label>
         <input type="file" id="payReceipt" accept="image/*">
       </div>
       <div class="err" id="payErr"></div>
-      <button class="btn btn-primary" id="paySubmitBtn" onclick="submitPayment()">إرسال الطلب</button>
+      <button class="btn btn-primary" id="paySubmitBtn" onclick="submitPayment()" data-i18n="btn_send_request">إرسال الطلب</button>
     </div>
   </section>
 
   <nav id="nav" style="display:none;">
-    <button class="nav-item" data-tab="admin" id="navAdmin" style="display:none;" onclick="showTab('admin')"><span class="ic">🛡️</span>الإدارة</button>
-    <button class="nav-item active" data-tab="create" onclick="showTab('create')"><span class="ic">✨</span>إنشاء</button>
-    <button class="nav-item" data-tab="projects" onclick="showTab('projects')"><span class="ic">📁</span>مشاريعي</button>
-    <button class="nav-item" data-tab="support" onclick="showTab('support')"><span class="ic">🎧</span>الدعم</button>
-    <button class="nav-item" data-tab="account" onclick="showTab('account')"><span class="ic">👤</span>حسابي</button>
+    <button class="nav-item" data-tab="admin" id="navAdmin" style="display:none;" onclick="showTab('admin')"><span class="ic">🛡️</span><span data-i18n="nav_admin">الإدارة</span></button>
+    <button class="nav-item active" data-tab="create" onclick="showTab('create')"><span class="ic">✨</span><span data-i18n="nav_create">إنشاء</span></button>
+    <button class="nav-item" data-tab="projects" onclick="showTab('projects')"><span class="ic">📁</span><span data-i18n="nav_projects">مشاريعي</span></button>
+    <button class="nav-item" data-tab="support" onclick="showTab('support')"><span class="ic">🎧</span><span data-i18n="nav_support">الدعم</span></button>
+    <button class="nav-item" data-tab="account" onclick="showTab('account')"><span class="ic">👤</span><span data-i18n="nav_account">حسابي</span></button>
   </nav>
 
   <div class="toast" id="toast"></div>
@@ -427,6 +446,133 @@ let currentType='موقع إلكتروني';
 let currentGenerated=null;
 let authMode='login';
 
+/* ====== THEME + LANGUAGE ====== */
+const translations = {
+  ar: {
+    auth_hero:"حوّل فكرتك إلى منتج حقيقي", auth_sub:"سجّل الدخول أو أنشئ حساباً للمتابعة",
+    tab_login:"تسجيل الدخول", tab_signup:"إنشاء حساب",
+    label_email:"البريد الإلكتروني", label_password:"كلمة المرور",
+    forgot_pw:"هل نسيت كلمة المرور؟", whatsapp_dev:"تواصل مع المطوّر عبر واتساب",
+    reset_hero:"تعيين كلمة مرور جديدة", label_new_password:"كلمة المرور الجديدة", btn_update_password:"تحديث كلمة المرور",
+    create_title:"إنشاء مشروع", badge_ai:"بالذكاء الاصطناعي",
+    create_banner_title:"حوّل فكرتك إلى منتج حقيقي",
+    create_banner_sub:"اكتب فكرتك وسنبني لك نسخة تجريبية عاملة يمكنك معاينتها وتنزيلها فوراً.",
+    label_type:"نوع المشروع", type_site:"موقع إلكتروني", type_app:"تطبيق جوال",
+    label_project_name:"اسم المشروع", ph_project_name:"مثال: متجر القهوة",
+    label_idea:"صف فكرتك بالتفصيل", ph_idea:"مثال: موقع لعرض قائمة قهوة مع صفحة عن المقهى وطريقة للتواصل عبر واتساب...",
+    btn_generate:"إنشاء التصور", status_building:"جاري البناء...",
+    label_preview:"المعاينة", btn_download:"تنزيل الملف", btn_new_project:"مشروع جديد",
+    nav_create:"إنشاء", nav_projects:"مشاريعي", nav_support:"الدعم", nav_account:"حسابي", nav_admin:"الإدارة",
+    empty_projects:"لا توجد مشاريع بعد", empty_projects_sub:"ابدأ من تبويب \"إنشاء\"",
+    no_name:"بدون اسم",
+    ph_chat:"اكتب رسالتك...", support_welcome:"أهلاً بك في دعم SUDAI 👋 اكتب رسالتك وسيصل فريق الدعم بها مباشرة.",
+    support_send_fail:"تعذّر إرسال الرسالة، تحقق من الإنترنت وحاول مرة أخرى.",
+    acct_email:"البريد الإلكتروني", acct_count:"عدد المشاريع", acct_limit:"الحد المسموح",
+    btn_request_increase:"طلب زيادة عدد المشاريع", btn_logout:"تسجيل الخروج",
+    payment_title:"طلب زيادة الحد",
+    payment_banner_title:"5 مشاريع إضافية مقابل 1000 جنيه سوداني",
+    payment_banner_sub:"حوّل المبلغ عبر إحدى الوسائل التالية، ثم ارفع صورة إشعار التحويل — سيراجع الأدمن طلبك يدوياً.",
+    label_pay_method:"طريقة الدفع", pay_bankak:"بنكك", pay_mycashi:"ماي كاشي", pay_bravo:"برافو",
+    pay_transfer_to:"حوّل إلى رقم الحساب",
+    label_note_optional:"ملاحظة (اختياري)", ph_pay_note:"مثال: تم التحويل عبر ماي كاشي الساعة ٣ عصراً",
+    label_receipt:"صورة إشعار التحويل", btn_send_request:"إرسال الطلب",
+    coming_soon:"سيتوفر قريباً",
+    err_pw_len:"كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+    pw_update_ok:"تم تحديث كلمة المرور بنجاح", pw_update_fail:"تعذّر تحديث كلمة المرور، أعد طلب الرابط وحاول مجدداً",
+    reset_sent:"تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك", reset_fail:"تعذّر إرسال رابط إعادة التعيين، تحقق من صحة البريد",
+    signup_ok:"تم إنشاء الحساب، تحقق من بريدك لتأكيده ثم سجّل الدخول",
+    idea_required:"اكتب فكرة المشروع أولاً",
+    limit_reached:"وصلت للحد المسموح", limit_reached_suffix:" — يمكنك طلب زيادة من تبويب حسابي",
+    gen_fail_invalid:"تعذّر بناء نسخة صالحة، حاول صياغة الفكرة بشكل أوضح",
+    gen_fail_generic:"حدث خطأ أثناء التوليد، حاول مرة أخرى",
+    pay_choose_method:"اختر طريقة الدفع أولاً", pay_choose_receipt:"ارفع صورة إشعار التحويل",
+    pay_sent_ok:"تم إرسال طلبك بنجاح، سيراجعه الأدمن قريباً", pay_sent_fail:"تعذّر إرسال الطلب، حاول مرة أخرى"
+  },
+  en: {
+    auth_hero:"Turn your idea into a real product", auth_sub:"Sign in or create an account to continue",
+    tab_login:"Sign In", tab_signup:"Sign Up",
+    label_email:"Email", label_password:"Password",
+    forgot_pw:"Forgot your password?", whatsapp_dev:"Contact the developer on WhatsApp",
+    reset_hero:"Set a new password", label_new_password:"New password", btn_update_password:"Update password",
+    create_title:"Create project", badge_ai:"AI-powered",
+    create_banner_title:"Turn your idea into a real product",
+    create_banner_sub:"Describe your idea and we'll build a working demo you can preview and download instantly.",
+    label_type:"Project type", type_site:"Website", type_app:"Mobile app",
+    label_project_name:"Project name", ph_project_name:"e.g. Coffee Shop",
+    label_idea:"Describe your idea in detail", ph_idea:"e.g. A website with a coffee menu, an about page, and a WhatsApp contact option...",
+    btn_generate:"Generate", status_building:"Building...",
+    label_preview:"Preview", btn_download:"Download file", btn_new_project:"New project",
+    nav_create:"Create", nav_projects:"Projects", nav_support:"Support", nav_account:"Account", nav_admin:"Admin",
+    empty_projects:"No projects yet", empty_projects_sub:"Start from the \"Create\" tab",
+    no_name:"Untitled",
+    ph_chat:"Type your message...", support_welcome:"Welcome to SUDAI support 👋 Type your message and our team will get it right away.",
+    support_send_fail:"Couldn't send the message, check your connection and try again.",
+    acct_email:"Email", acct_count:"Project count", acct_limit:"Allowed limit",
+    btn_request_increase:"Request more projects", btn_logout:"Sign out",
+    payment_title:"Request limit increase",
+    payment_banner_title:"5 extra projects for 1000 SDG",
+    payment_banner_sub:"Transfer the amount via one of the methods below, then upload the receipt — the admin will review your request manually.",
+    label_pay_method:"Payment method", pay_bankak:"Bankak", pay_mycashi:"MyCashi", pay_bravo:"Bravo",
+    pay_transfer_to:"Transfer to account number",
+    label_note_optional:"Note (optional)", ph_pay_note:"e.g. Transferred via MyCashi at 3pm",
+    label_receipt:"Transfer receipt image", btn_send_request:"Send request",
+    coming_soon:"Coming soon",
+    err_pw_len:"Password must be at least 6 characters",
+    pw_update_ok:"Password updated successfully", pw_update_fail:"Couldn't update the password, request a new link and try again",
+    reset_sent:"A password reset link has been sent to your email", reset_fail:"Couldn't send the reset link, check the email address",
+    signup_ok:"Account created, check your email to confirm then sign in",
+    idea_required:"Write your project idea first",
+    limit_reached:"You've reached the allowed limit", limit_reached_suffix:" — you can request more from the Account tab",
+    gen_fail_invalid:"Couldn't build a valid version, try describing the idea more clearly",
+    gen_fail_generic:"Something went wrong while generating, try again",
+    pay_choose_method:"Choose a payment method first", pay_choose_receipt:"Upload the transfer receipt image",
+    pay_sent_ok:"Your request was sent successfully, the admin will review it soon", pay_sent_fail:"Couldn't send the request, try again"
+  }
+};
+
+let currentLang = localStorage.getItem('sudai_lang') || 'ar';
+
+function tr(key){
+  return (translations[currentLang] && translations[currentLang][key]) || translations.ar[key] || key;
+}
+
+function applyLanguage(lang){
+  currentLang = lang;
+  try{ localStorage.setItem('sudai_lang', lang); }catch(e){}
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang==='ar' ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = tr(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ el.setAttribute('placeholder', tr(el.getAttribute('data-i18n-ph'))); });
+  const langBtn=document.getElementById('langToggleBtn');
+  if(langBtn) langBtn.textContent = lang==='ar' ? 'EN' : 'AR';
+  const authSubmitBtn=document.getElementById('authSubmit');
+  if(authSubmitBtn) authSubmitBtn.textContent = tr(authMode==='signup' ? 'tab_signup' : 'tab_login');
+}
+
+function toggleLang(){ applyLanguage(currentLang==='ar' ? 'en' : 'ar'); }
+
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  try{ localStorage.setItem('sudai_theme', theme); }catch(e){}
+  const btn=document.getElementById('themeToggleBtn');
+  if(btn) btn.textContent = theme==='dark' ? '☀️' : '🌙';
+}
+
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme') ||
+    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light');
+  applyTheme(cur==='dark' ? 'light' : 'dark');
+}
+
+(function initThemeIcon(){
+  const saved = localStorage.getItem('sudai_theme');
+  if(saved){ applyTheme(saved); }
+  else{
+    const btn=document.getElementById('themeToggleBtn');
+    if(btn) btn.textContent = window.matchMedia('(prefers-color-scheme: dark)').matches ? '☀️' : '🌙';
+  }
+})();
+
 async function callGemini(prompt){
   const { data, error } = await sb.functions.invoke('groq-proxy', { body: { prompt } });
   if(error) throw error;
@@ -435,32 +581,41 @@ async function callGemini(prompt){
   return text;
 }
 
+let isPasswordRecovery = /type=recovery/.test(window.location.hash) || /type=recovery/.test(window.location.search);
+if(isPasswordRecovery){ showScreen('reset-password'); }
+
 async function initCaps(){
+  if(isPasswordRecovery) return;
   const { data:{ session } } = await sb.auth.getSession();
   if(session && session.user){ currentUser = session.user; await afterLogin(); }
 }
 
 sb.auth.onAuthStateChange((event, session)=>{
-  if(event==='SIGNED_IN' && session && session.user && !currentUser){
+  if(event==='PASSWORD_RECOVERY'){ isPasswordRecovery = true; showScreen('reset-password'); return; }
+  if(event==='SIGNED_IN' && session && session.user && !currentUser && !isPasswordRecovery){
     currentUser = session.user; afterLogin();
   }
   if(event==='SIGNED_OUT'){ currentUser=null; showAuthScreen(); }
-  if(event==='PASSWORD_RECOVERY'){ showScreen('reset-password'); }
 });
 
 async function confirmNewPassword(){
   const pw = document.getElementById('newPassword').value;
   const errEl = document.getElementById('resetErr');
   errEl.textContent='';
-  if(!pw || pw.length<6){ errEl.textContent='كلمة المرور يجب أن تكون 6 أحرف على الأقل'; return; }
+  if(!pw || pw.length<6){ errEl.textContent=tr('err_pw_len'); return; }
   try{
-    const { data, error } = await sb.auth.updateUser({ password: pw });
+    const { error } = await sb.auth.updateUser({ password: pw });
     if(error) throw error;
-    showToast('تم تحديث كلمة المرور بنجاح');
-    currentUser = data.user;
-    await afterLogin();
+    await sb.auth.signOut();
+    isPasswordRecovery = false;
+    currentUser = null;
+    document.getElementById('newPassword').value='';
+    try{ history.replaceState(null, document.title, window.location.pathname); }catch(e){}
+    showAuthScreen();
+    switchAuthTab('login');
+    showToast(tr('pw_update_ok'));
   }catch(err){
-    errEl.textContent='تعذّر تحديث كلمة المرور، أعد طلب الرابط وحاول مجدداً';
+    errEl.textContent=tr('pw_update_fail');
   }
 }
 
@@ -475,7 +630,7 @@ function switchAuthTab(mode){
   authMode=mode;
   document.getElementById('tabLogin').classList.toggle('active', mode==='login');
   document.getElementById('tabSignup').classList.toggle('active', mode==='signup');
-  document.getElementById('authSubmit').textContent = mode==='login' ? 'تسجيل الدخول' : 'إنشاء حساب';
+  document.getElementById('authSubmit').textContent = tr(mode==='login' ? 'tab_login' : 'tab_signup');
   document.getElementById('authErr').textContent='';
   document.getElementById('forgotBtn').style.display = mode==='login' ? 'block' : 'none';
 }
@@ -486,9 +641,9 @@ async function forgotPassword(){
   try{
     const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.href.split('#')[0] });
     if(error) throw error;
-    showToast('تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك');
+    showToast(tr('reset_sent'));
   }catch(err){
-    showToast('تعذّر إرسال رابط إعادة التعيين، تحقق من صحة البريد');
+    showToast(tr('reset_fail'));
   }
 }
 
@@ -504,7 +659,7 @@ document.getElementById('authForm').addEventListener('submit', async (e)=>{
       const { data, error } = await sb.auth.signUp({ email, password });
       if(error) throw error;
       if(data.session){ currentUser=data.user; await afterLogin(); }
-      else { showToast('تم إنشاء الحساب، تحقق من بريدك لتأكيده ثم سجّل الدخول'); switchAuthTab('login'); }
+      else { showToast(tr('signup_ok')); switchAuthTab('login'); }
     } else {
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
       if(error) throw error;
@@ -572,8 +727,11 @@ function showTab(tab){
   if(tab==='projects') renderProjects();
   if(tab==='account'){ document.getElementById('acctCount').textContent=projects.length; }
   if(tab==='admin' && isAdmin) loadAdminCounts();
-  if(tab==='support' && document.getElementById('chatLog').children.length===0){
-    addMsg('bot','أهلاً بك في دعم SUDAI 👋 اكتب رسالتك وسيصل فريق الدعم بها مباشرة.');
+  stopSupportPolling();
+  if(tab==='support'){
+    lastSupportCount=-1;
+    loadSupportThread();
+    startSupportPolling();
   }
 }
 
@@ -595,14 +753,14 @@ function renderProjects(){
   const list=document.getElementById('projectsList');
   list.innerHTML='';
   if(!projects.length){
-    list.innerHTML = '<div class="empty"><span class="ic">📁</span>لا توجد مشاريع بعد<br>ابدأ من تبويب "إنشاء"</div>';
+    list.innerHTML = '<div class="empty"><span class="ic">📁</span>'+tr('empty_projects')+'<br>'+tr('empty_projects_sub')+'</div>';
     return;
   }
   projects.forEach(p=>{
     const div=document.createElement('div');
     div.className='proj-item';
     div.innerHTML = '<div class="proj-ic">'+(p.type==='تطبيق جوال'?'📱':'🌐')+'</div>'+
-      '<div class="proj-meta"><div class="proj-name">'+escapeHtml(p.name||'بدون اسم')+'</div>'+
+      '<div class="proj-meta"><div class="proj-name">'+escapeHtml(p.name||tr('no_name'))+'</div>'+
       '<div class="proj-sub">'+escapeHtml((p.idea||'').slice(0,40))+'</div></div>';
     div.onclick=()=>openSaved(p);
     list.appendChild(div);
@@ -829,8 +987,8 @@ async function submitPayment(){
   const note = document.getElementById('payNote').value.trim();
   const fileInput = document.getElementById('payReceipt');
   const file = fileInput.files && fileInput.files[0];
-  if(!selectedPayMethod){ errEl.textContent='اختر طريقة الدفع أولاً'; return; }
-  if(!file){ errEl.textContent='ارفع صورة إشعار التحويل'; return; }
+  if(!selectedPayMethod){ errEl.textContent=tr('pay_choose_method'); return; }
+  if(!file){ errEl.textContent=tr('pay_choose_receipt'); return; }
   const btn=document.getElementById('paySubmitBtn');
   btn.disabled=true;
   try{
@@ -841,7 +999,7 @@ async function submitPayment(){
       method: selectedPayMethod, amount: 1000, receipt_url: path, note: note
     });
     if(insErr) throw insErr;
-    showToast('تم إرسال طلبك بنجاح، سيراجعه الأدمن قريباً');
+    showToast(tr('pay_sent_ok'));
     document.getElementById('payNote').value='';
     fileInput.value='';
     document.querySelectorAll('#screen-request-payment .type-pick').forEach(p=>p.classList.remove('selected'));
@@ -849,7 +1007,7 @@ async function submitPayment(){
     selectedPayMethod=null;
     showTab('account');
   }catch(err){
-    errEl.textContent='تعذّر إرسال الطلب، حاول مرة أخرى';
+    errEl.textContent=tr('pay_sent_fail');
   }
   btn.disabled=false;
 }
@@ -918,9 +1076,9 @@ function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':
 async function generate(){
   const name=document.getElementById('projName').value.trim()||'مشروعي';
   const idea=document.getElementById('ideaInput').value.trim();
-  if(!idea){ showToast('اكتب فكرة المشروع أولاً'); return; }
+  if(!idea){ showToast(tr('idea_required')); return; }
   if(projects.length >= currentLimit){
-    showToast('وصلت للحد المسموح ('+currentLimit+') — يمكنك طلب زيادة من تبويب حسابي');
+    showToast(tr('limit_reached')+' ('+currentLimit+')'+tr('limit_reached_suffix'));
     return;
   }
 
@@ -928,7 +1086,7 @@ async function generate(){
   btn.disabled=true;
   document.getElementById('genStatus').style.display='flex';
   document.getElementById('previewWrap').style.display='none';
-  document.getElementById('genStatusText').textContent='جاري البناء...';
+  document.getElementById('genStatusText').textContent=tr('status_building');
 
   const prompt = "أنت مولّد مواقع وتطبيقات. أنشئ ملف HTML واحد متكامل ومستقل (يحتوي CSS وJS بداخله فقط، بدون أي روابط خارجية) يمثل نسخة تجريبية عاملة وحديثة من الفكرة التالية.\nنوع المنتج: "+currentType+"\nاسم المشروع: "+name+"\nوصف الفكرة: "+idea+"\n\nالمتطلبات:\n- تصميم حديث وعملي، متجاوب مع الجوال، بواجهة عربية (dir=\"rtl\") إن كانت الفكرة بالعربية.\n- اجعله تفاعلياً قدر الإمكان باستخدام JavaScript بسيط داخل الملف (بدون طلبات شبكة خارجية).\n- أرجع فقط كود HTML كاملاً بدءاً من <!DOCTYPE html> بدون أي شرح أو نص إضافي أو علامات markdown.";
 
@@ -936,7 +1094,7 @@ async function generate(){
     let html = await callGemini(prompt);
     html = html.trim().replace(/^```(?:html)?/i,'').replace(/```$/,'').trim();
     if(!/^<!DOCTYPE|^<html/i.test(html)){
-      showToast('تعذّر بناء نسخة صالحة، حاول صياغة الفكرة بشكل أوضح');
+      showToast(tr('gen_fail_invalid'));
       document.getElementById('genStatus').style.display='none';
       btn.disabled=false;
       return;
@@ -949,13 +1107,13 @@ async function generate(){
     if(!error && data){
       currentGenerated=data; projects.unshift(data);
     } else if(error && /project_limit_reached/i.test(error.message||'')){
-      showToast('وصلت للحد المسموح من المشاريع، يمكنك طلب زيادة من تبويب حسابي');
+      showToast(tr('limit_reached')+tr('limit_reached_suffix'));
       document.getElementById('previewWrap').style.display='none';
     } else {
       currentGenerated=record;
     }
   }catch(err){
-    showToast('حدث خطأ أثناء التوليد، حاول مرة أخرى');
+    showToast(tr('gen_fail_generic'));
   }
   document.getElementById('genStatus').style.display='none';
   btn.disabled=false;
@@ -993,29 +1151,111 @@ function addMsg(who,text){
 const TG_TOKEN = "8853019567:AAGHlwqZbkdULEK7OE1BrFO-ZFByYYDTf4U";
 const TG_CHAT_ID = "8248472364";
 
-async function sendChat(){
-  const inp=document.getElementById('chatInput');
-  const val=inp.value.trim();
-  if(!val) return;
-  addMsg('user',val);
-  inp.value='';
-  addMsg('bot','...');
+let supportPoll=null;
+let lastSupportCount=-1;
+
+async function loadSupportThread(){
+  if(!currentUser) return;
+  const { data, error } = await sb.from('support_messages').select('*').eq('user_id', currentUser.id).order('created_at', { ascending:true });
+  if(error) return;
+  if(data.length===lastSupportCount) return;
+  lastSupportCount=data.length;
   const log=document.getElementById('chatLog');
-  const placeholder=log.lastChild;
-  try{
-    const text = "رسالة دعم جديدة من SUDAI\nالبريد: "+(currentUser?currentUser.email:'غير مسجل')+"\n\n"+val;
-    const res = await fetch("https://api.telegram.org/bot"+TG_TOKEN+"/sendMessage", {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ chat_id: TG_CHAT_ID, text: text })
-    });
-    if(!res.ok) throw new Error('failed');
-    placeholder.textContent='تم إرسال رسالتك بنجاح ✅ سيتواصل معك فريق الدعم قريباً.';
-  }catch(e){
-    placeholder.textContent='تعذّر إرسال الرسالة، تحقق من الإنترنت وحاول مرة أخرى.';
+  log.innerHTML='';
+  if(data.length===0){
+    addMsg('bot',tr('support_welcome'));
+  }else{
+    data.forEach(m=> addMsg(m.sender==='admin' ? 'bot' : 'user', m.message));
   }
 }
 
+function startSupportPolling(){
+  stopSupportPolling();
+  supportPoll=setInterval(loadSupportThread, 4000);
+}
+function stopSupportPolling(){
+  if(supportPoll){ clearInterval(supportPoll); supportPoll=null; }
+}
+
+async function sendChat(){
+  const inp=document.getElementById('chatInput');
+  const val=inp.value.trim();
+  if(!val || !currentUser) return;
+  inp.value='';
+  try{
+    const { error } = await sb.from('support_messages').insert({ user_id: currentUser.id, sender:'user', message: val });
+    if(error) throw error;
+    lastSupportCount=-1;
+    loadSupportThread();
+    const text = "رسالة دعم جديدة من SUDAI\nالبريد: "+currentUser.email+"\n\n"+val;
+    fetch("https://api.telegram.org/bot"+TG_TOKEN+"/sendMessage", {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ chat_id: TG_CHAT_ID, text: text })
+    }).catch(()=>{});
+  }catch(e){
+    addMsg('bot',tr('support_send_fail'));
+  }
+}
+
+let currentSupportTargetUser=null;
+let adminThreadPoll=null;
+
+async function openAdminSupport(){
+  showScreen('admin-support');
+  const { data, error } = await sb.rpc('admin_list_support_threads');
+  const wrap=document.getElementById('adminSupportList');
+  wrap.innerHTML='';
+  if(error || !data || data.length===0){
+    wrap.innerHTML='<div class="card" style="text-align:center; color:var(--ink-soft);">لا توجد رسائل دعم حتى الآن</div>';
+    return;
+  }
+  data.forEach(t=>{
+    const d=document.createElement('div');
+    d.className='admin-card';
+    d.onclick=()=>openSupportThread(t.user_id, t.email);
+    d.innerHTML='<div class="admin-card-ic">💬</div><div class="admin-card-body"><div class="t2">'+t.email+'</div><div class="s2">'+String(t.last_message).slice(0,40)+'</div></div><div class="chev">‹</div>';
+    wrap.appendChild(d);
+  });
+}
+
+async function openSupportThread(userId, email){
+  currentSupportTargetUser=userId;
+  document.getElementById('supportThreadTitle').textContent=email;
+  showScreen('admin-support-thread');
+  await loadAdminThreadMessages();
+  adminThreadPoll=setInterval(loadAdminThreadMessages, 4000);
+}
+
+function stopAdminThreadPolling(){
+  if(adminThreadPoll){ clearInterval(adminThreadPoll); adminThreadPoll=null; }
+}
+
+async function loadAdminThreadMessages(){
+  if(!currentSupportTargetUser) return;
+  const { data, error } = await sb.rpc('admin_get_support_thread', { target_user_id: currentSupportTargetUser });
+  const log=document.getElementById('adminChatLog');
+  if(error || !data) return;
+  log.innerHTML='';
+  data.forEach(m=>{
+    const d=document.createElement('div');
+    d.className='msg '+(m.sender==='admin' ? 'user' : 'bot');
+    d.textContent=m.message;
+    log.appendChild(d);
+  });
+  log.scrollTop=log.scrollHeight;
+}
+
+async function adminSendReply(){
+  const inp=document.getElementById('adminChatInput');
+  const val=inp.value.trim();
+  if(!val || !currentSupportTargetUser) return;
+  inp.value='';
+  await sb.from('support_messages').insert({ user_id: currentSupportTargetUser, sender:'admin', message: val });
+  loadAdminThreadMessages();
+}
+
+applyLanguage(currentLang);
 initCaps();
 </script>
 </body>
